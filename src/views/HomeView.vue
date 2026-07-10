@@ -37,7 +37,7 @@ import { RouterLink } from 'vue-router'
           <div>vite v8 · building for production...</div>
           <div class="ok">✓ built in 1.2s</div>
           <div class="muted">$ actions: deploy → pages</div>
-          <div class="ok">✓ live at /IOSDecryptHubPage/</div>
+          <div class="ok">✓ live at ios.decrypthub.com</div>
         </div>
       </div>
     </section>

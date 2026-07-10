@@ -17,4 +17,4 @@ npm run build
 
 ## 在线地址
 
-https://taisuii.github.io/IOSDecryptHubPage/
+https://ios.decrypthub.com/
