@@ -4,16 +4,304 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>iOS Decrypt Hub</title>
+    <meta
+      name="description"
+      content="IOSDecryptHub — 基于 fishhook 的 iOS App 运行时加解密审计平台。注入即可实时看到 App 调用系统加密 API 的算法、Key、IV、明文、密文与调用栈，并支持砸壳脱壳与 Capstone/MCP 静态分析。"
+    />
+    <meta name="theme-color" content="#070d0b" />
+    <title>IOSDecryptHub · iOS 运行时加解密审计平台</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
-    <div id="app"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <!-- ================= NAV ================= -->
+    <header class="nav" id="nav">
+      <a class="nav__brand" href="#top" aria-label="IOSDecryptHub 首页">
+        <span class="nav__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="20" height="20" fill="none">
+            <path d="M10 15v-2a6 6 0 0 1 12 0v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <rect x="8.5" y="15" width="15" height="10" rx="2.6" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 19v2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="nav__word">IOSDecrypt<b>Hub</b></span>
+      </a>
+      <nav class="nav__links" aria-label="主导航">
+        <a href="#capabilities">能力</a>
+        <a href="#panel">实时面板</a>
+        <a href="#algorithms">算法覆盖</a>
+        <a href="#dump">砸壳</a>
+        <a href="#mcp">MCP 分析</a>
+        <a href="#start">上手</a>
+      </nav>
+      <a
+        class="nav__cta"
+        href="https://github.com/taisuii/ios-decrypt-helper"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        <span>GitHub</span>
+      </a>
+      <button class="nav__burger" id="burger" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <main id="top">
+      <!-- ================= HERO ================= -->
+      <section class="hero" id="hero">
+        <canvas class="hero__canvas" id="hero-canvas" aria-hidden="true"></canvas>
+        <div class="hero__veil" aria-hidden="true"></div>
+        <div class="hero__inner">
+          <div class="hero__copy">
+            <div class="tag reveal">
+              <span class="tag__dot"></span>
+              基于 fishhook · iOS 运行时插桩
+            </div>
+            <h1 class="hero__title reveal">
+              让 App 的每一次加密，<br />
+              <span class="grad">在你眼前明文流过</span>
+            </h1>
+            <p class="hero__sub reveal">
+              把一个零依赖 dylib 注入目标 App，它调用系统加密 API 的那一刻——算法、Key、IV、明文、密文与完整调用栈，
+              全部实时呈现在浏览器面板里。加解密审计、文件与系统监控、按需砸壳、Capstone / MCP 静态分析，一体化。
+            </p>
+            <div class="hero__cta reveal">
+              <a class="btn btn--primary" href="#panel">
+                看它能捕获什么
+                <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M4 10h11m0 0-4-4m4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+              <a class="btn btn--ghost" href="#start">快速上手</a>
+            </div>
+            <dl class="hero__stats reveal">
+              <div><dt data-count="20" data-suffix="+">0</dt><dd>拦截算法族</dd></div>
+              <div><dt data-count="11">0</dt><dd>MCP 分析工具</dd></div>
+              <div><dt data-count="8088">0</dt><dd>本地面板端口</dd></div>
+              <div><dt data-count="0" data-text="零">0</dt><dd>第三方依赖</dd></div>
+            </dl>
+          </div>
+
+          <div class="hero__term reveal">
+            <div class="term">
+              <div class="term__bar">
+                <span class="term__dot"></span><span class="term__dot"></span><span class="term__dot"></span>
+                <span class="term__title">decrypt_helper — inject</span>
+              </div>
+              <pre class="term__body" id="term-body" aria-hidden="true"></pre>
+            </div>
+          </div>
+        </div>
+        <div class="hero__scroll" aria-hidden="true"><span></span>向下滚动</div>
+      </section>
+
+      <!-- ================= MARQUEE ================= -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track" id="marquee-track"></div>
+      </div>
+
+      <!-- ================= CAPABILITIES ================= -->
+      <section class="section" id="capabilities">
+        <div class="wrap">
+          <header class="head reveal">
+            <span class="head__kicker">01 — 能力全景</span>
+            <h2 class="head__title">一次注入，六条监控与分析主线</h2>
+            <p class="head__lead">
+              拦截的是 CommonCrypto、Security.framework、OpenSSL EVP 三套系统库，以及沙盒文件与动态库加载；
+              再叠加进程内砸壳与 Capstone 反汇编。同名接口在 macOS 与 iOS 上通用。
+            </p>
+          </header>
+          <div class="caps" id="caps-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================= LIVE CAPTURE FEED ================= -->
+      <section class="section section--feed" id="feed">
+        <div class="wrap">
+          <header class="head reveal">
+            <span class="head__kicker">02 — 实时捕获流</span>
+            <h2 class="head__title">注入进目标进程，事件即刻流出</h2>
+            <p class="head__lead">
+              下面是一段模拟的捕获流：App 自己调用加密 API，每条调用都被解析成结构化事件。
+              真实面板里，点任意一条即可展开 Key / IV / 明文 / 密文的 Hex、HexDump 与调用栈。
+            </p>
+          </header>
+          <div class="feed reveal">
+            <div class="feed__stream" id="feed-stream" aria-live="off"></div>
+            <div class="feed__detail" id="feed-detail"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= INTERACTIVE PANEL ================= -->
+      <section class="section" id="panel">
+        <div class="wrap">
+          <header class="head reveal">
+            <span class="head__kicker">03 — Web 面板</span>
+            <h2 class="head__title">浏览器即控制台：多 tab 左右分栏</h2>
+            <p class="head__lead">
+              dylib 加载后自动在 8088 起一个零依赖 HTTP 服务。加解密 / 文件 / 系统 / 符号 / Dump 五个 tab，
+              共享同一套 master-detail。这是可交互的复刻——切 tab、点条目试试。
+            </p>
+          </header>
+          <div class="mock reveal" id="mock-panel"></div>
+          <div class="shots reveal">
+            <figure class="shot">
+              <img src="/shots/floating.png" alt="iOS 悬浮窗：毛玻璃质感，显示各分类计数与服务地址" loading="lazy" />
+              <figcaption>悬浮窗 · 毛玻璃，可拖动收起成胶囊</figcaption>
+            </figure>
+            <figure class="shot">
+              <img src="/shots/logview.png" alt="全屏日志查看器：分类切换、搜索、详情展开" loading="lazy" />
+              <figcaption>全屏日志查看器 · 分类 / 搜索 / 详情</figcaption>
+            </figure>
+            <figure class="shot">
+              <img src="/shots/test-host.png" alt="交互式测试宿主 App：分 tab 触发各类加密调用" loading="lazy" />
+              <figcaption>交互式测试台 · 逐个触发算法验证 hook</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ALGORITHMS ================= -->
+      <section class="section section--alt" id="algorithms">
+        <div class="wrap">
+          <header class="head reveal">
+            <span class="head__kicker">04 — 算法覆盖</span>
+            <h2 class="head__title">从 MD5 到 ChaCha20-Poly1305，一次性与流式都收</h2>
+            <p class="head__lead">
+              摘要、HMAC、对称、非对称、KDF 全线覆盖；流式 Init / Update / Final 会把分片喂入的数据拼回完整明文。
+              目标若链接 libcrypto，OpenSSL EVP 对称也一并接管。
+            </p>
+          </header>
+          <div class="algo" id="algo-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================= DUMP PIPELINE ================= -->
+      <section class="section" id="dump">
+        <div class="wrap">
+          <header class="head reveal">
+            <span class="head__kicker">05 — 砸壳 / 脱壳</span>
+            <h2 class="head__title">把内核已解密的内存，写回一份干净镜像</h2>
+            <p class="head__lead">
+              FairPlay 加密的 __TEXT 在运行时已被内核解密进内存。按需触发——不点按钮就不跑，零额外开销——
+              把已解密的页写回磁盘，并将 cryptid 置 0。产出可直接喂给 IDA / Ghidra，或重打包成可重签 IPA。
+            </p>
+          </header>
+          <div class="pipe reveal" id="dump-pipe"></div>
+          <div class="pipe__notes reveal" id="dump-notes"></div>
+        </div>
+      </section>
+
+      <!-- ================= MCP / CAPSTONE ================= -->
+      <section class="section section--alt" id="mcp">
+        <div class="wrap">
+          <header class="head reveal">
+            <span class="head__kicker">06 — MCP · Capstone</span>
+            <h2 class="head__title">给 AI 一个进程内的反汇编与交叉引用后端</h2>
+            <p class="head__lead">
+              注入的 dylib 内置一个 MCP (Model Context Protocol) 服务器，复用 8088 端口。
+              AI 客户端通过 JSON-RPC 调用 Capstone 反汇编、镜像枚举与四件套 xref。选一个工具看它做什么。
+            </p>
+          </header>
+          <div class="mcp reveal">
+            <ul class="mcp__list" id="mcp-list" role="tablist" aria-label="MCP 工具"></ul>
+            <div class="mcp__stage">
+              <div class="mcp__panelhead">
+                <span class="mcp__name" id="mcp-name">disassemble</span>
+                <span class="mcp__req" id="mcp-req"></span>
+              </div>
+              <p class="mcp__desc" id="mcp-desc"></p>
+              <div class="mcp__io">
+                <div class="mcp__col">
+                  <span class="mcp__lbl">tools/call</span>
+                  <pre class="mcp__code" id="mcp-in"></pre>
+                </div>
+                <div class="mcp__col">
+                  <span class="mcp__lbl">result</span>
+                  <pre class="mcp__code mcp__code--out" id="mcp-out"></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= HEALTH / FAIL-LOUD ================= -->
+      <section class="section" id="health">
+        <div class="wrap band reveal">
+          <div class="band__copy">
+            <span class="head__kicker">07 — fail-loud</span>
+            <h2 class="head__title">失效就让它可见，绝不静默兜底</h2>
+            <p class="head__lead">
+              hook 框架最怕「时好时坏」。每个模块安装后立即自检，没挂上的符号被记录；
+              HTTP 起不来、落盘失败、流式加密遇到未跟踪的上下文都会上报——
+              悬浮窗红字、面板红色横幅、控制台 <code>[IOSDecryptHub/ERR]</code> 三处同时可见，但不中止宿主 App。
+            </p>
+          </div>
+          <div class="band__health">
+            <div class="hbar"><span>hooks</span><b class="ok">124 / 124 已挂载</b></div>
+            <div class="hbar"><span>http :8088</span><b class="ok">listening</b></div>
+            <div class="hbar"><span>log sink</span><b class="ok">flushing</b></div>
+            <div class="hbar hbar--warn"><span>MD2 / MD4</span><b class="warn">skipped · 系统已移除</b></div>
+            <code class="band__api">GET /api/stats → { health: { hookFailures: 0, sink: "ok" } }</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= GET STARTED ================= -->
+      <section class="section section--alt" id="start">
+        <div class="wrap">
+          <header class="head reveal">
+            <span class="head__kicker">08 — 上手</span>
+            <h2 class="head__title">三步：编译 · 注入 · 打开面板</h2>
+            <p class="head__lead">
+              越狱设备可直接安装；非越狱设备用 AltStore / Sideloadly 重签后安装。产物是单个 dylib。
+            </p>
+          </header>
+          <div class="start reveal">
+            <ol class="start__steps" id="start-steps"></ol>
+            <div class="start__card">
+              <div class="start__tabs" id="start-tabs"></div>
+              <pre class="start__code" id="start-code"></pre>
+              <button class="start__copy" id="start-copy" type="button">复制命令</button>
+            </div>
+          </div>
+          <p class="note reveal">
+            安全提示：Web 与 MCP 服务均无认证、监听 0.0.0.0，会把 Key 与明文暴露给同网络中任何能连接的人。
+            仅在可信网络中调试使用；砸壳与分发受版权保护的程序可能违法，仅限授权安全测试与自有 App。
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="foot">
+      <div class="wrap foot__grid">
+        <div class="foot__brand">
+          <span class="nav__word">IOSDecrypt<b>Hub</b></span>
+          <p>基于 fishhook 的 iOS App 运行时加解密审计与逆向分析平台。</p>
+        </div>
+        <div class="foot__links">
+          <a href="https://github.com/taisuii/ios-decrypt-helper" target="_blank" rel="noreferrer">源码仓库</a>
+          <a href="https://github.com/taisuii/ios-decrypt-helper/issues/new/choose" target="_blank" rel="noreferrer">反馈 Issue</a>
+          <a href="#capabilities">能力</a>
+          <a href="#start">上手</a>
+        </div>
+      </div>
+      <div class="wrap foot__base">
+        <span>© 2026 IOSDecryptHub · 仅供授权安全测试与研究</span>
+        <span>Built with Vite · Three.js</span>
+      </div>
+    </footer>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
