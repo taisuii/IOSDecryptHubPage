@@ -21,9 +21,10 @@ export function initHero3D(canvas) {
   const root = new THREE.Group();
   scene.add(root);
 
-  const MINT = new THREE.Color(0x35e39a);
-  const MINT_D = new THREE.Color(0x12a06a);
-  const BLUE = new THREE.Color(0x6aa9e9);
+  // 黑白场景: 墨黑主线 + 灰色粒子 (对应设计系统 #0d0d0d / #8c8c8c)
+  const MINT = new THREE.Color(0x0d0d0d);
+  const MINT_D = new THREE.Color(0x8c8c8c);
+  const BLUE = new THREE.Color(0x8c8c8c);
 
   // --- core: icosahedron wireframe ---
   const coreGeo = new THREE.IcosahedronGeometry(2.15, 1);
@@ -57,7 +58,7 @@ export function initHero3D(canvas) {
     parr[i * 3] = r * Math.sin(phi) * Math.cos(theta);
     parr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
     parr[i * 3 + 2] = r * Math.cos(phi);
-    const c = Math.random() < 0.22 ? BLUE : MINT;
+    const c = Math.random() < 0.35 ? MINT : BLUE;
     carr[i * 3] = c.r; carr[i * 3 + 1] = c.g; carr[i * 3 + 2] = c.b;
   }
   const fieldGeo = new THREE.BufferGeometry();
