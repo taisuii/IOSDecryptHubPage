@@ -179,17 +179,12 @@ function initMockPanel() {
   const host = $('#mock-panel');
   host.innerHTML = `
     <div class="rc__header">
-      <div class="rc__brand"><span class="rc__mark">DH</span><b>IOSDecryptHub</b><span>Runtime Console</span></div>
-      <div class="rc__stats"><i></i><b id="rc-total">141</b> 条 · hooks <b>124/124</b></div>
-      <div class="rc__actions">
-        <label><input type="checkbox" id="rc-auto" checked> 自动刷新</label>
-        <button type="button" data-demo-action="download">下载全部日志</button>
-        <button type="button" data-demo-action="diag">审查日志</button>
-        <button type="button" data-demo-action="mcp">MCP</button>
-        <button type="button" class="primary" data-demo-action="settings">设置</button>
+      <div class="rc__brand"><b>IOSDecryptHub</b><span class="rc__live"><i></i>运行中</span></div>
+      <div class="rc__app">
+        <span>Crypto Test</span><strong>com.taisuii.cryptotesthost</strong><span>PID <b>73582</b></span>
+        <span>iOS <b>18.5</b></span><span>arm64 · <b>8 GB</b></span>
       </div>
     </div>
-    <div class="rc__proc"><span class="rc__appicon">CT</span><b>Crypto Test</b><span>com.taisuii.cryptotesthost</span><span>PID <b>73582</b></span><span>iOS <b>18.5</b></span><span>iPhone 16 Pro</span><span>RAM <b>8192 MB</b></span></div>
     <div class="rc__tabs" id="mock-tabs"></div>
     <div class="rc__toolbar">
       <div class="rc__filters"><label id="rc-filter-label">分类</label><select id="rc-cat"><option value="all">全部</option></select><input id="rc-search" type="search" placeholder="搜索本类: 算法/路径/明文/Hex…"><span class="rc__size"><label>输入大小</label><input id="rc-min" type="number" min="0" placeholder="0"><span>—</span><input id="rc-max" type="number" min="0" placeholder="不限"><span>B</span></span></div>
@@ -311,7 +306,8 @@ function initMockPanel() {
     paused = !paused;
     event.currentTarget.textContent = paused ? '继续' : '暂停';
     event.currentTarget.classList.toggle('active', paused);
-    $('.rc__stats i', host).className = paused ? 'paused' : '';
+    $('.rc__live i', host).className = paused ? 'paused' : '';
+    $('.rc__live', host).lastChild.textContent = paused ? '已暂停' : '运行中';
   });
   $('#rc-clear', host).addEventListener('click', () => {
     list.innerHTML = '<div class="rc__empty">演示面板不会删除测试数据</div>';
@@ -326,7 +322,7 @@ function initMockPanel() {
   });
   $$('[data-demo-action]', host).forEach((button) => button.addEventListener('click', () => {
     const label = button.dataset.demoAction;
-    if (label === 'tab-download' || label === 'download') {
+    if (label === 'tab-download') {
       const blob = new Blob([JSON.stringify(activeTab.rows, null, 2)], { type: 'application/json' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob); link.download = `iosdecrypthub-${activeTab.key}.json`; link.click();
