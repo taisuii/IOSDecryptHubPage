@@ -114,13 +114,13 @@ code, pre { font-family: var(--mono); }
 
 /* Capability blocks */
 .caps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.cap { --card-accent: var(--blue); position: relative; min-height: 330px; overflow: hidden; padding: 0 24px 24px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); transition: transform .25s var(--ease), border-color .25s; }
+.cap { --card-accent: var(--blue); position: relative; min-height: 330px; overflow: hidden; padding: 0 24px 24px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); transition: border-color .25s; }
 .cap:nth-child(2) { --card-accent: var(--coral); }
 .cap:nth-child(3) { --card-accent: var(--amber); }
 .cap:nth-child(4) { --card-accent: var(--lilac); }
 .cap:nth-child(5) { --card-accent: var(--cyan); }
 .cap:nth-child(6) { --card-accent: var(--pink); }
-.cap:hover { transform: translateY(-5px); border-color: var(--card-accent); }
+.cap:hover { border-color: var(--card-accent); }
 .cap__bar { height: 86px; margin: 0 -24px 22px; padding: 16px 18px; display: flex; align-items: flex-start; justify-content: space-between; color: #090a0d; background: var(--card-accent); }
 .cap__num { font: 600 12px/1 var(--mono); }
 .cap__ico { width: 38px; height: 38px; display: grid; place-items: center; color: #090a0d; }
