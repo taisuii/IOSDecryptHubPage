@@ -1,20 +1,20 @@
 /* ============================================================
    IOSDecryptHub - 黑白单主题
-   黑底、白字、少量冷灰层次，避免彩色和灰雾感。
+   黑白为骨架，语义层保留少量冷蓝/琥珀/紫色，避免全灰疲劳。
    ============================================================ */
 
 :root {
   --bg: #000000;
-  --bg-2: #080808;
-  --panel: #0e0e0e;
-  --panel-2: #161616;
-  --line: #2a2a2a;
-  --line-soft: rgba(255, 255, 255, 0.08);
+  --bg-2: #090a0c;
+  --panel: #111318;
+  --panel-2: #191c22;
+  --line: #3a3f48;
+  --line-soft: rgba(255, 255, 255, 0.1);
   --ink: #ffffff;
   --ink-2: #e8e8e8;
   --ink-3: #b9b9b9;
   --accent: #ffffff;
-  --accent-2: #d8d8d8;
+  --accent-2: #8ab4ff;
   --accent-deep: #f3f3f3;
   --on-accent: #000000;
   --on-accent-soft: rgba(0, 0, 0, 0.22);
@@ -25,29 +25,29 @@
   --font: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --hover: rgba(255, 255, 255, 0.08);
-  --hover-soft: rgba(255, 255, 255, 0.05);
-  --hover-mid: rgba(255, 255, 255, 0.06);
-  --mark: rgba(255, 255, 255, 0.1);
+  --hover: rgba(138, 180, 255, 0.12);
+  --hover-soft: rgba(255, 255, 255, 0.06);
+  --hover-mid: rgba(138, 180, 255, 0.1);
+  --mark: rgba(138, 180, 255, 0.14);
   --nav-blur: rgba(0, 0, 0, 0.84);
   --nav-mobile: rgba(0, 0, 0, 0.97);
   --veil-a: rgba(0, 0, 0, 0.14);
   --veil-b: rgba(0, 0, 0, 0.72);
   --veil-c: rgba(255, 255, 255, 0.03);
-  --dot-ring: rgba(255, 255, 255, 0.14);
-  --grad-mark: rgba(255, 255, 255, 0.16);
-  --cap-sheen: rgba(255, 255, 255, 0.06);
-  --scan: rgba(255, 255, 255, 0.03);
+  --dot-ring: rgba(138, 180, 255, 0.18);
+  --grad-mark: rgba(138, 180, 255, 0.2);
+  --cap-sheen: rgba(138, 180, 255, 0.08);
+  --scan: rgba(255, 255, 255, 0.035);
   --grain-blend: screen;
   --grain-op: 0.018;
   --scanline-op: 0.4;
-  --term-ring: rgba(255, 255, 255, 0.08);
-  --inv-bg: #070707;
-  --inv-line: #202020;
+  --term-ring: rgba(138, 180, 255, 0.1);
+  --inv-bg: #06070a;
+  --inv-line: #2d3440;
   --inv-ink: #ffffff;
   --inv-ink-2: #e5e5e5;
   --inv-ink-3: #b7b7b7;
-  --inv-ink-4: #8d8d8d;
+  --inv-ink-4: #8ab4ff;
   --inv-hair: rgba(255, 255, 255, 0.14);
   --inv-hair-2: rgba(255, 255, 255, 0.3);
   --inv-dim: rgba(229, 229, 229, 0.7);
@@ -55,12 +55,12 @@
   --inv-faint: rgba(205, 205, 205, 0.55);
   --inv-bar: rgba(255, 255, 255, 0.12);
   --inv-bar-bg: rgba(255, 255, 255, 0.04);
-  --cat-digest: #ffffff; --cat-digest-bg: #101010;
-  --cat-symm:   #ededed; --cat-symm-bg:   #121212;
-  --cat-hmac:   #d9d9d9; --cat-hmac-bg:   #101010;
-  --cat-asym:   #c8c8c8; --cat-asym-bg:   #101010;
-  --cat-kdf:    #b7b7b7; --cat-kdf-bg:    #101010;
-  --cat-evp:    #f5f5f5; --cat-evp-bg:    #101010;
+  --cat-digest: #9ee6b6; --cat-digest-bg: #10251a;
+  --cat-symm:   #f0b76f; --cat-symm-bg:   #2a1d0f;
+  --cat-hmac:   #8ab4ff; --cat-hmac-bg:   #101d34;
+  --cat-asym:   #d7a6ff; --cat-asym-bg:   #251231;
+  --cat-kdf:    #ff9ead; --cat-kdf-bg:    #2e1118;
+  --cat-evp:    #8fd7ff; --cat-evp-bg:    #0d2433;
 }
 
 *,
@@ -291,11 +291,12 @@ code, pre { font-family: var(--mono); }
 @keyframes feedIn { from { opacity: 0; transform: translateY(-10px) scale(0.98); } to { opacity: 1; transform: none; } }
 .fcard__badge { font-family: var(--mono); font-size: 0.64rem; padding: 0.2rem 0.45rem; border-radius: 4px; font-weight: 600; letter-spacing: 0.03em; white-space: nowrap; }
 /* monochrome badge system: fill / outline / dashed tell categories apart */
-.b-digest, .b-symm, .b-hmac, .b-asym, .b-kdf, .b-evp {
-  color: var(--ink);
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-}
+.b-digest { color: var(--cat-digest); background: var(--cat-digest-bg); border: 1px solid var(--line); }
+.b-symm { color: var(--cat-symm); background: var(--cat-symm-bg); border: 1px solid var(--line); }
+.b-hmac { color: var(--cat-hmac); background: var(--cat-hmac-bg); border: 1px solid var(--line); }
+.b-asym { color: var(--cat-asym); background: var(--cat-asym-bg); border: 1px solid var(--line); }
+.b-kdf { color: var(--cat-kdf); background: var(--cat-kdf-bg); border: 1px solid var(--line); }
+.b-evp { color: var(--cat-evp); background: var(--cat-evp-bg); border: 1px solid var(--line); }
 .fcard__main { flex: 1; min-width: 0; }
 .fcard__algo { font-weight: 600; font-size: 0.95rem; }
 .fcard__meta { font-family: var(--mono); font-size: 0.74rem; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -407,7 +408,7 @@ code, pre { font-family: var(--mono); }
 .mcp__code { margin: 0.55rem 0 0; font-size: 0.74rem; line-height: 1.65; color: var(--ink-2); white-space: pre-wrap; word-break: break-word; max-height: 16rem; overflow-y: auto; }
 .mcp__code--out { color: var(--ink); }
 .mcp__code .j-key { color: var(--ink); font-weight: 600; }
-.mcp__code .j-str { color: var(--ink-2); }
+.mcp__code .j-str { color: var(--accent-2); }
 .mcp__code .j-num { color: var(--ink-3); }
 .mcp__code .asm-m { color: var(--ink); font-weight: 600; }
 .mcp__code .asm-a { color: var(--ink-3); }
