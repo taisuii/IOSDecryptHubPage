@@ -22,9 +22,10 @@ export function initHero3D(canvas) {
   scene.add(root);
 
   const WHITE = new THREE.Color(0xf5f5f5);
-  const SILVER = new THREE.Color(0xc8c8c8);
-  const BLUE = new THREE.Color(0x8ab4ff);
-  const SMOKE = new THREE.Color(0x7a7a7a);
+  const SILVER = new THREE.Color(0xc8cbd2);
+  const BLUE = new THREE.Color(0x78a9ff);
+  const CORAL = new THREE.Color(0xff8b7b);
+  const SMOKE = new THREE.Color(0x626772);
 
   // --- core: icosahedron wireframe ---
   const coreGeo = new THREE.IcosahedronGeometry(2.15, 1);
@@ -60,7 +61,7 @@ export function initHero3D(canvas) {
     parr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
     parr[i * 3 + 2] = r * Math.cos(phi);
     seeds[i] = Math.random();
-    const c = seeds[i] < 0.52 ? WHITE : seeds[i] < 0.76 ? BLUE : seeds[i] < 0.9 ? SILVER : SMOKE;
+    const c = seeds[i] < 0.6 ? WHITE : seeds[i] < 0.82 ? BLUE : seeds[i] < 0.9 ? CORAL : SMOKE;
     carr[i * 3] = c.r; carr[i * 3 + 1] = c.g; carr[i * 3 + 2] = c.b;
   }
   const fieldGeo = new THREE.BufferGeometry();

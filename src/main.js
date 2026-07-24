@@ -101,10 +101,13 @@ function initMarquee() {
 /* ---------------- capabilities ---------------- */
 function initCaps() {
   const grid = $('#caps-grid');
-  CAPABILITIES.forEach((c) => {
+  CAPABILITIES.forEach((c, index) => {
     const card = el('article', 'cap reveal');
     card.innerHTML = `
-      <div class="cap__ico"><svg viewBox="0 0 24 24" fill="none">${c.icon}</svg></div>
+      <div class="cap__bar">
+        <span class="cap__num">0${index + 1}</span>
+        <div class="cap__ico"><svg viewBox="0 0 24 24" fill="none">${c.icon}</svg></div>
+      </div>
       <h3>${c.title}</h3>
       <p>${c.desc}</p>
       <div class="cap__tags">${c.tags.map((t) => `<span>${t}</span>`).join('')}</div>`;

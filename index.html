@@ -8,7 +8,7 @@
       name="description"
       content="IOSDecryptHub — 基于 fishhook 的 iOS App 运行时加解密审计平台。注入即可实时看到 App 调用系统加密 API 的算法、Key、IV、明文、密文与调用栈，并支持砸壳脱壳与 Capstone/MCP 静态分析。"
     />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#050506" />
     <title>IOSDecryptHub · iOS 运行时加解密审计平台</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -71,15 +71,15 @@
           <div class="hero__copy">
             <div class="tag reveal">
               <span class="tag__dot"></span>
-              基于 fishhook · iOS 运行时插桩
+              iOS Runtime Intelligence
             </div>
             <h1 class="hero__title reveal">
-              让 App 的每一次加密，<br />
-              <span class="grad">在你眼前明文流过</span>
+              IOSDecryptHub<br />
+              <span class="grad">看见运行时的真相</span>
             </h1>
             <p class="hero__sub reveal">
-              把一个零依赖 dylib 注入目标 App，它调用系统加密 API 的那一刻——算法、Key、IV、明文、密文与完整调用栈，
-              全部实时呈现在浏览器面板里。加解密审计、文件与系统监控、按需砸壳、Capstone / MCP 静态分析，一体化。
+              注入一个零依赖 dylib，把加解密、文件、网络、Keychain 与动态加载行为转成可检索的结构化事件；
+              再用 Web 控制台完成审计、砸壳与 Capstone / MCP 静态分析。
             </p>
             <div class="hero__cta reveal">
               <a class="btn btn--primary" href="#panel">
@@ -105,6 +105,9 @@
               <pre class="term__body" id="term-body" aria-hidden="true"></pre>
             </div>
           </div>
+          <div class="hero__signal" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
         </div>
         <div class="hero__scroll" aria-hidden="true"><span></span>向下滚动</div>
       </section>
@@ -119,7 +122,7 @@
         <div class="wrap">
           <header class="head reveal">
             <span class="head__kicker">01 — 能力全景</span>
-            <h2 class="head__title">一次注入，六条监控与分析主线</h2>
+            <h2 class="head__title">同一条运行时链路，六种观察视角</h2>
             <p class="head__lead">
               拦截的是 CommonCrypto、Security.framework、OpenSSL EVP 三套系统库，以及沙盒文件与动态库加载；
               再叠加进程内砸壳与 Capstone 反汇编。同名接口在 macOS 与 iOS 上通用。
@@ -152,25 +155,21 @@
         <div class="wrap">
           <header class="head reveal">
             <span class="head__kicker">03 — Web 面板</span>
-            <h2 class="head__title">浏览器即控制台：多 tab 左右分栏</h2>
+            <h2 class="head__title">所有分析，都回到一个 Web 工作台</h2>
             <p class="head__lead">
               dylib 加载后自动在 8088 起一个零依赖 HTTP 服务。加解密 / 文件 / 系统 / 符号 / Dump 五个 tab，
-              共享同一套 master-detail。这是可交互的复刻——切 tab、点条目试试。
+              共享同一套主从视图。筛选、对比、导出和配置都在浏览器完成，不再依赖 App 内日志页。
             </p>
           </header>
           <div class="mock reveal" id="mock-panel"></div>
           <div class="shots reveal">
-            <figure class="shot">
-              <img src="/shots/floating.png" alt="iOS 悬浮窗：黑白卡片，显示各分类计数与服务地址" loading="lazy" />
-              <figcaption>悬浮窗 · 黑白卡片，可拖动收起成胶囊</figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/shots/logview.png" alt="全屏日志查看器：分类切换、搜索、详情展开" loading="lazy" />
-              <figcaption>全屏日志查看器 · 分类 / 搜索 / 详情</figcaption>
+            <figure class="shot shot--wide">
+              <img src="/shots/web-panel.png" alt="IOSDecryptHub Web 控制台：事件列表、筛选与详情" loading="lazy" />
+              <figcaption><b>Web 控制台</b><span>检索、详情、导出与配置的唯一工作入口</span></figcaption>
             </figure>
             <figure class="shot">
               <img src="/shots/test-host.png" alt="交互式测试宿主 App：分 tab 触发各类加密调用" loading="lazy" />
-              <figcaption>交互式测试台 · 逐个触发算法验证 hook</figcaption>
+              <figcaption><b>验证台</b><span>逐项触发算法并确认 hook 链路</span></figcaption>
             </figure>
           </div>
         </div>
