@@ -21,22 +21,21 @@ export function initHero3D(canvas) {
   const root = new THREE.Group();
   scene.add(root);
 
-  const MINT = new THREE.Color(0x40e0c4);
-  const MINT_D = new THREE.Color(0x0b7f7a);
-  const BLUE = new THREE.Color(0x4db7ff);
-  const AMBER = new THREE.Color(0xffc66d);
+  const WHITE = new THREE.Color(0xf5f5f5);
+  const SILVER = new THREE.Color(0xc8c8c8);
+  const SMOKE = new THREE.Color(0x7a7a7a);
 
   // --- core: icosahedron wireframe ---
   const coreGeo = new THREE.IcosahedronGeometry(2.15, 1);
   const edges = new THREE.EdgesGeometry(coreGeo);
   const core = new THREE.LineSegments(
     edges,
-    new THREE.LineBasicMaterial({ color: MINT, transparent: true, opacity: 0.55 })
+    new THREE.LineBasicMaterial({ color: WHITE, transparent: true, opacity: 0.55 })
   );
   root.add(core);
 
   // inner solid faceted glow
-  const innerMat = new THREE.MeshBasicMaterial({ color: MINT_D, transparent: true, opacity: 0.06, side: THREE.DoubleSide });
+  const innerMat = new THREE.MeshBasicMaterial({ color: SMOKE, transparent: true, opacity: 0.06, side: THREE.DoubleSide });
   const inner = new THREE.Mesh(new THREE.IcosahedronGeometry(2.1, 1), innerMat);
   root.add(inner);
 
@@ -44,7 +43,7 @@ export function initHero3D(canvas) {
   const pos = coreGeo.attributes.position;
   const nodeGeo = new THREE.BufferGeometry();
   nodeGeo.setAttribute('position', pos.clone());
-  const nodes = new THREE.Points(nodeGeo, new THREE.PointsMaterial({ color: MINT, size: 0.09, transparent: true, opacity: 0.9 }));
+  const nodes = new THREE.Points(nodeGeo, new THREE.PointsMaterial({ color: WHITE, size: 0.09, transparent: true, opacity: 0.9 }));
   root.add(nodes);
 
   // --- orbiting particle field ---
@@ -60,7 +59,7 @@ export function initHero3D(canvas) {
     parr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
     parr[i * 3 + 2] = r * Math.cos(phi);
     seeds[i] = Math.random();
-    const c = seeds[i] < 0.34 ? MINT : seeds[i] < 0.72 ? BLUE : AMBER;
+    const c = seeds[i] < 0.55 ? WHITE : seeds[i] < 0.82 ? SILVER : SMOKE;
     carr[i * 3] = c.r; carr[i * 3 + 1] = c.g; carr[i * 3 + 2] = c.b;
   }
   const fieldGeo = new THREE.BufferGeometry();
@@ -72,14 +71,14 @@ export function initHero3D(canvas) {
   // --- scanning ring ---
   const ring = new THREE.Mesh(
     new THREE.TorusGeometry(2.7, 0.02, 8, 120),
-    new THREE.MeshBasicMaterial({ color: MINT_D, transparent: true, opacity: 0.45 })
+    new THREE.MeshBasicMaterial({ color: SILVER, transparent: true, opacity: 0.42 })
   );
   ring.rotation.x = Math.PI / 2.2;
   root.add(ring);
 
   const ring2 = new THREE.Mesh(
     new THREE.TorusGeometry(3.3, 0.012, 8, 120),
-    new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0.22 })
+    new THREE.MeshBasicMaterial({ color: SMOKE, transparent: true, opacity: 0.22 })
   );
   ring2.rotation.x = Math.PI / 1.7;
   ring2.rotation.y = Math.PI / 5;
