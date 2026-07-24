@@ -41,8 +41,8 @@
         <span class="nav__word">IOSDecrypt<b>Hub</b></span>
       </a>
       <nav class="nav__links" aria-label="主导航">
-        <a href="#capabilities">能力</a>
         <a href="#panel">实时面板</a>
+        <a href="#capabilities">能力</a>
         <a href="#algorithms">算法覆盖</a>
         <a href="#dump">砸壳</a>
         <a href="#mcp">MCP 分析</a>
@@ -90,7 +90,7 @@
             </div>
             <dl class="hero__stats reveal">
               <div><dt data-count="20" data-suffix="+">0</dt><dd>拦截算法族</dd></div>
-              <div><dt data-count="11">0</dt><dd>MCP 分析工具</dd></div>
+              <div><dt data-count="36">0</dt><dd>MCP 工具</dd></div>
               <div><dt data-count="8088">0</dt><dd>本地面板端口</dd></div>
               <div><dt data-count="0" data-text="零">0</dt><dd>第三方依赖</dd></div>
             </dl>
@@ -117,11 +117,26 @@
         <div class="marquee__track" id="marquee-track"></div>
       </div>
 
-      <!-- ================= CAPABILITIES ================= -->
-      <section class="section" id="capabilities">
+      <!-- ================= INTERACTIVE PANEL ================= -->
+      <section class="section section--panel" id="panel">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">01 — 能力全景</span>
+            <span class="head__kicker">01 — 实时面板</span>
+            <h2 class="head__title">插件里的运行时控制台，直接在这里操作</h2>
+            <p class="head__lead">
+              界面与插件内置页面保持一致。切换页签、筛选与搜索测试 IPA 产生的日志，点任意记录查看
+              Key、IV、输入输出、HexDump 与调用栈。
+            </p>
+          </header>
+          <div class="runtime-console reveal" id="mock-panel"></div>
+        </div>
+      </section>
+
+      <!-- ================= CAPABILITIES ================= -->
+      <section class="section section--alt" id="capabilities">
+        <div class="wrap">
+          <header class="head reveal">
+            <span class="head__kicker">02 — 能力全景</span>
             <h2 class="head__title">同一条运行时链路，六种观察视角</h2>
             <p class="head__lead">
               拦截的是 CommonCrypto、Security.framework、OpenSSL EVP 三套系统库，以及沙盒文件与动态库加载；
@@ -132,54 +147,11 @@
         </div>
       </section>
 
-      <!-- ================= LIVE CAPTURE FEED ================= -->
-      <section class="section section--feed" id="feed">
-        <div class="wrap">
-          <header class="head reveal">
-            <span class="head__kicker">02 — 实时捕获流</span>
-            <h2 class="head__title">注入进目标进程，事件即刻流出</h2>
-            <p class="head__lead">
-              下面是一段模拟的捕获流：App 自己调用加密 API，每条调用都被解析成结构化事件。
-              真实面板里，点任意一条即可展开 Key / IV / 明文 / 密文的 Hex、HexDump 与调用栈。
-            </p>
-          </header>
-          <div class="feed reveal">
-            <div class="feed__stream" id="feed-stream" aria-live="off"></div>
-            <div class="feed__detail" id="feed-detail"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= INTERACTIVE PANEL ================= -->
-      <section class="section" id="panel">
-        <div class="wrap">
-          <header class="head reveal">
-            <span class="head__kicker">03 — Web 面板</span>
-            <h2 class="head__title">所有分析，都回到一个 Web 工作台</h2>
-            <p class="head__lead">
-              dylib 加载后自动在 8088 起一个零依赖 HTTP 服务。加解密 / 文件 / 系统 / 符号 / Dump 五个 tab，
-              共享同一套主从视图。筛选、对比、导出和配置都在浏览器完成，不再依赖 App 内日志页。
-            </p>
-          </header>
-          <div class="mock reveal" id="mock-panel"></div>
-          <div class="shots reveal">
-            <figure class="shot shot--wide">
-              <img src="/shots/web-panel.png" alt="IOSDecryptHub Web 控制台：事件列表、筛选与详情" loading="lazy" />
-              <figcaption><b>Web 控制台</b><span>检索、详情、导出与配置的唯一工作入口</span></figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/shots/test-host.png" alt="交互式测试宿主 App：分 tab 触发各类加密调用" loading="lazy" />
-              <figcaption><b>验证台</b><span>逐项触发算法并确认 hook 链路</span></figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
       <!-- ================= ALGORITHMS ================= -->
       <section class="section section--alt" id="algorithms">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">04 — 算法覆盖</span>
+            <span class="head__kicker">03 — 算法覆盖</span>
             <h2 class="head__title">从 MD5 到 ChaCha20-Poly1305，一次性与流式都收</h2>
             <p class="head__lead">
               摘要、HMAC、对称、非对称、KDF 全线覆盖；流式 Init / Update / Final 会把分片喂入的数据拼回完整明文。
@@ -194,7 +166,7 @@
       <section class="section" id="dump">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">05 — 砸壳 / 脱壳</span>
+            <span class="head__kicker">04 — 砸壳 / 脱壳</span>
             <h2 class="head__title">把内核已解密的内存，写回一份干净镜像</h2>
             <p class="head__lead">
               FairPlay 加密的 __TEXT 在运行时已被内核解密进内存。按需触发——不点按钮就不跑，零额外开销——
@@ -210,11 +182,11 @@
       <section class="section section--alt" id="mcp">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">06 — MCP · Capstone</span>
-            <h2 class="head__title">给 AI 一个进程内的反汇编与交叉引用后端</h2>
+            <span class="head__kicker">05 — MCP · 36 tools</span>
+            <h2 class="head__title">从运行时取证到反汇编，全部工具都在这里</h2>
             <p class="head__lead">
               注入的 dylib 内置一个 MCP (Model Context Protocol) 服务器，复用 8088 端口。
-              AI 客户端通过 JSON-RPC 调用 Capstone 反汇编、镜像枚举与四件套 xref。选一个工具看它做什么。
+              36 个工具覆盖 Capstone 分析、内存与符号、运行时事件、沙盒文件、砸壳、捕获控制和配置。选一个工具查看调用方式。
             </p>
           </header>
           <div class="mcp reveal">
@@ -244,7 +216,7 @@
       <section class="section" id="health">
         <div class="wrap band reveal">
           <div class="band__copy">
-            <span class="head__kicker">07 — fail-loud</span>
+            <span class="head__kicker">06 — fail-loud</span>
             <h2 class="head__title">失效就让它可见，绝不静默兜底</h2>
             <p class="head__lead">
               hook 框架最怕「时好时坏」。每个模块安装后立即自检，没挂上的符号被记录；
@@ -266,7 +238,7 @@
       <section class="section section--alt" id="start">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">08 — 上手</span>
+            <span class="head__kicker">07 — 上手</span>
             <h2 class="head__title">三步：编译 · 注入 · 打开面板</h2>
             <p class="head__lead">
               越狱设备可直接安装；非越狱设备用 AltStore / Sideloadly 重签后安装。产物是单个 dylib。

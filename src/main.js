@@ -1,7 +1,7 @@
 import './style.css';
 import { initHero3D } from './scene/hero3d.js';
 import {
-  MARQUEE, CAPABILITIES, CAPTURES, ALGO_GROUPS, DUMP_STEPS, DUMP_NOTES,
+  MARQUEE, CAPABILITIES, ALGO_GROUPS, DUMP_STEPS, DUMP_NOTES,
   MCP_TOOLS, START_STEPS, START_TABS, TERM_LINES,
 } from './data.js';
 
@@ -115,187 +115,228 @@ function initCaps() {
   });
 }
 
-/* ---------------- capture feed ---------------- */
-function renderDetail(host, c) {
-  host.innerHTML = `
-    <div class="det__head"><span class="fcard__badge b-${c.cat}">${c.badge}</span><h4>${c.algo}</h4></div>
-    <div class="det__body">
-      ${c.fields.map(([k, v, cls]) => `
-        <div class="det__row"><span class="det__k">${k}</span><span class="det__v ${cls || ''}">${v}</span></div>`).join('')}
-      <div class="det__block">
-        <div class="det__blabel">HEXDUMP</div>
-        <pre class="det__hex">${c.hex}</pre>
-      </div>
-      <div class="det__block">
-        <div class="det__blabel">调用栈 · backtrace</div>
-        <pre class="det__stack">${c.stack.join('\n')}</pre>
-      </div>
-    </div>`;
-}
-function initFeed() {
-  const stream = $('#feed-stream');
-  const detail = $('#feed-detail');
-  let seq = 87;
-  let activeIdx = 0;
-  renderDetail(detail, CAPTURES[0]);
-
-  function makeCard(c, idx) {
-    const card = el('div', 'fcard');
-    card.innerHTML = `
-      <span class="fcard__badge b-${c.cat}">${c.badge}</span>
-      <div class="fcard__main">
-        <div class="fcard__algo">${c.algo}</div>
-        <div class="fcard__meta">#${seq}  ·  ${c.meta}</div>
-      </div>
-      <span class="fcard__size">${c.size}</span>`;
-    card.addEventListener('click', () => {
-      $$('.fcard', stream).forEach((n) => n.classList.remove('active'));
-      card.classList.add('active');
-      renderDetail(detail, c);
-    });
-    return card;
-  }
-
-  // seed
-  CAPTURES.slice(0, 5).forEach((c, i) => stream.appendChild(makeCard(c, i)));
-  $('.fcard', stream)?.classList.add('active');
-
-  if (reduce) return;
-  let i = 0;
-  setInterval(() => {
-    seq++;
-    i = (i + 1) % CAPTURES.length;
-    const card = makeCard(CAPTURES[i], i);
-    stream.prepend(card);
-    while (stream.children.length > 7) stream.lastElementChild.remove();
-  }, 2600);
-}
-
-/* ---------------- interactive mock panel ---------------- */
+/* ---------------- interactive runtime console ---------------- */
 const PANEL_TABS = [
   {
-    key: 'crypto', label: '加解密', count: 67,
+    key: 'crypto', label: '加解密', filter: '分类',
     rows: [
-      { seq: 92, op: 'AES-256-GCM', badge: 'symm', sub: 'EVP_EncryptUpdate · 128 B', time: '18:45:31.204',
-        detail: { title: 'AES-256-GCM · encrypt', fields: [['algo', 'AES-256-GCM (AEAD)'], ['key', 'kck_2f…9a (32 B)'], ['iv', 'random 12 B nonce'], ['tag', '4c1a…9f (16 B)'], ['plain', '{"cmd":"unlock","door":7}']], hex: '000000: 7b 22 63 6d 64 22 3a 22  75 6e 6c 6f 63 6b 22 2c  |{"cmd":"unlock",|' } },
-      { seq: 90, op: 'HMAC-SHA256', badge: 'hmac', sub: 'CCHmac · 32 B', time: '18:45:30.902',
-        detail: { title: 'HMAC-SHA256', fields: [['algo', 'HMAC-SHA256'], ['key', 'server_secret_v3'], ['plain', 'GET/v2/orders?ts=175323']], hex: '000000: 47 45 54 2f 76 32 2f 6f  72 64 65 72 73 3f 74 73  |GET/v2/orders?ts|' } },
-      { seq: 86, op: 'RSA-2048 sign', badge: 'asym', sub: 'SecKeyCreateSignature · 256 B', time: '18:45:30.464',
-        detail: { title: 'RSA-2048 · sign', fields: [['algo', 'RSA-2048 PKCS1v15-SHA256'], ['key', 'SecKeyRef 0x2803… (private)'], ['plain', 'nonce=8f3a;device=iPhone16']], hex: '000000: 6e 6f 6e 63 65 3d 38 66  33 61 3b 64 65 76 69 63  |nonce=8f3a;devic|' } },
-      { seq: 80, op: 'PBKDF2', badge: 'kdf', sub: 'CCKeyDerivationPBKDF · 100000 it', time: '18:45:26.917',
-        detail: { title: 'PBKDF2-HMAC-SHA256', fields: [['pass', 'hunter2 (明文口令)'], ['salt', 'f0e1d2c3b4a5 (8 B)'], ['iter', '100000'], ['dk', '2f9c…be (32 B)']], hex: '000000: 68 75 6e 74 65 72 32                              |hunter2|' } },
+      { seq: 118, cat: 'symm', badge: '对称', algo: 'AES-128-CBC', op: 'encrypt', time: '14:32:18.481', inLen: 53, outLen: 64, preview: 'the answer is 42; this is a longer plaintext for AES', key: '00112233445566778899aabbccddeeff', iv: '101112131415161718191a1b1c1d1e1f', input: 'the answer is 42; this is a longer plaintext for AES', output: '8c7e63d05e8b7d0b72e1c8b863fe8ef0…', stack: '0  exercise_runner  test_aes + 0xb8\n1  exercise_runner  main + 0x54' },
+      { seq: 117, cat: 'hmac', badge: 'HMAC', algo: 'HMAC-SHA256 (streaming)', op: 'digest', time: '14:32:18.436', inLen: 26, outLen: 32, preview: 'important transaction data', key: '7368617265642d7365637265742d6b6579', input: 'important transaction data', output: '270f6edcd7b2811fb982279661d143c8…', stack: '0  exercise_runner  test_hmac + 0x104\n1  exercise_runner  main + 0x4c' },
+      { seq: 116, cat: 'hmac', badge: 'HMAC', algo: 'HMAC-SHA1', op: 'digest', time: '14:32:18.431', inLen: 26, outLen: 20, preview: 'important transaction data', key: '7368617265642d7365637265742d6b6579', input: 'important transaction data', output: '4eaef67d8a9f8c49523c7771d692370b…', stack: '0  exercise_runner  test_hmac + 0x98\n1  exercise_runner  main + 0x4c' },
+      { seq: 115, cat: 'digest', badge: '摘要', algo: 'SHA256 (streaming)', op: 'digest', time: '14:32:18.420', inLen: 43, outLen: 32, preview: 'the quick brown fox jumps over the lazy dog', input: 'the quick brown fox jumps over the lazy dog', output: '05c6e08f1d9fdafa031a9ce2d9cafa01…', stack: '0  exercise_runner  test_digests + 0x1d8\n1  exercise_runner  main + 0x44' },
+      { seq: 114, cat: 'digest', badge: '摘要', algo: 'SHA512', op: 'digest', time: '14:32:18.416', inLen: 43, outLen: 64, preview: 'the quick brown fox jumps over the lazy dog', input: 'the quick brown fox jumps over the lazy dog', output: '05c6e08f1d9fdafa031a9ce2d9cafa01…', stack: '0  exercise_runner  test_digests + 0x160\n1  exercise_runner  main + 0x44' },
+      { seq: 113, cat: 'digest', badge: '摘要', algo: 'SHA256', op: 'digest', time: '14:32:18.412', inLen: 43, outLen: 32, preview: 'the quick brown fox jumps over the lazy dog', input: 'the quick brown fox jumps over the lazy dog', output: '05c6e08f1d9fdafa031a9ce2d9cafa01…', stack: '0  exercise_runner  test_digests + 0xf0\n1  exercise_runner  main + 0x44' },
+      { seq: 112, cat: 'digest', badge: '摘要', algo: 'SHA1', op: 'digest', time: '14:32:18.409', inLen: 43, outLen: 20, preview: 'the quick brown fox jumps over the lazy dog', input: 'the quick brown fox jumps over the lazy dog', output: '2fd4e1c67a2d28fced849ee1bb76e739…', stack: '0  exercise_runner  test_digests + 0xb4\n1  exercise_runner  main + 0x44' },
+      { seq: 111, cat: 'digest', badge: '摘要', algo: 'MD5', op: 'digest', time: '14:32:18.405', inLen: 43, outLen: 16, preview: 'the quick brown fox jumps over the lazy dog', input: 'the quick brown fox jumps over the lazy dog', output: '9e107d9d372bb6826bd81d3542a419d6', stack: '0  exercise_runner  test_digests + 0x58\n1  exercise_runner  main + 0x44' },
+      { seq: 109, cat: 'asym', badge: '非对称', algo: 'RSA-2048', op: 'sign', time: '14:32:18.382', inLen: 19, outLen: 256, preview: 'transfer 100 to bob', input: 'transfer 100 to bob', output: '31fa882d443f150952469efd5b5d02fa…', stack: '0  Security  SecKeyCreateSignature + 0x0\n1  exercise_runner  test_rsa + 0xdc' },
+      { seq: 107, cat: 'kdf', badge: 'KDF', algo: 'PBKDF2-HMAC-SHA256', op: 'derive (rounds=10000)', time: '14:32:18.320', inLen: 13, outLen: 32, preview: 'user-password', key: 'salt: 73616c7473616c74', input: 'user-password', output: '2f9cf975aac2c866762840d0d1e3b575…', stack: '0  CryptoTestHost  do_pbkdf + 0x60\n1  CryptoTestHost  -[ViewController onPBKDF] + 0x18' },
     ],
   },
   {
-    key: 'file', label: '文件', count: 10,
+    key: 'sys', label: '系统', filter: '类型',
     rows: [
-      { seq: 91, op: 'write', badge: 'symm', sub: 'Documents/session.dat · 512 B', time: '18:45:31.010',
-        detail: { title: 'write()', fields: [['path', '.../Documents/session.dat'], ['bytes', '512'], ['fd', '7'], ['preview', 'AES blob (base64) …']], hex: '000000: 65 79 4a 30 62 32 74 6c  62 69 49 36 49 6e 4e 72  |eyJ0b2tlbiI6InNr|' } },
-      { seq: 88, op: 'unlink', badge: 'kdf', sub: 'tmp/upload_cache.tmp', time: '18:45:30.551',
-        detail: { title: 'unlink()', fields: [['path', '.../tmp/upload_cache.tmp'], ['result', '0 (ok)']], hex: '（无数据段）' } },
-      { seq: 84, op: 'rename', badge: 'hmac', sub: 'a.part → a.mp4', time: '18:45:29.220',
-        detail: { title: 'rename()', fields: [['from', '.../Caches/a.part'], ['to', '.../Caches/a.mp4']], hex: '（无数据段）' } },
-      { seq: 79, op: 'open', badge: 'digest', sub: 'Library/keychain.db · O_RDWR', time: '18:45:25.700',
-        detail: { title: 'open()', fields: [['path', '.../Library/keychain.db'], ['flags', 'O_RDWR | O_CREAT'], ['fd', '9']], hex: '（无数据段）' } },
+      { seq: 132, cat: 'file', badge: '文件', algo: 'mmap', op: '59 bytes · PROT_READ', time: '14:32:18.812', inLen: 59, outLen: 0, preview: '/tmp/dh_file_probe.bin', input: 'sekret-token=abc123; device_id=DEADBEEF; probe file content', output: '', stack: '0  exercise_runner  test_file + 0xe8\n1  exercise_runner  main + 0x68' },
+      { seq: 131, cat: 'file', badge: '文件', algo: 'read', op: '59 bytes', time: '14:32:18.809', inLen: 59, outLen: 0, preview: '/tmp/dh_file_probe.bin', input: 'sekret-token=abc123; device_id=DEADBEEF; probe file content', output: '', stack: '0  exercise_runner  test_file + 0xb8\n1  exercise_runner  main + 0x68' },
+      { seq: 130, cat: 'file', badge: '文件', algo: 'write', op: '59 bytes', time: '14:32:18.804', inLen: 59, outLen: 0, preview: '/tmp/dh_file_probe.bin', input: 'sekret-token=abc123; device_id=DEADBEEF; probe file content', output: '', stack: '0  exercise_runner  test_file + 0x58\n1  exercise_runner  main + 0x68' },
+      { seq: 128, cat: 'sys', badge: '系统', algo: 'ptrace', op: '已空转', time: '14:32:18.780', inLen: 0, outLen: 0, preview: 'PT_DENY_ATTACH 被拦截（反调试绕过）', input: '', output: '', stack: '0  exercise_runner  test_env + 0xc4\n1  exercise_runner  main + 0x74' },
+      { seq: 126, cat: 'sys', badge: '系统', algo: 'access', op: '已隐藏', time: '14:32:18.771', inLen: 0, outLen: 0, preview: '/bin/bash', input: '', output: '', stack: '0  exercise_runner  test_env + 0x24\n1  exercise_runner  main + 0x74' },
+      { seq: 124, cat: 'sys', badge: '系统', algo: 'dlsym', op: '重定向', time: '14:32:18.739', inLen: 0, outLen: 0, preview: 'CCCrypt → hook_CCCrypt', input: '', output: '', stack: '0  CryptoTestHost  do_dlsym + 0x50\n1  CryptoTestHost  -[ViewController onDlsym] + 0x18' },
     ],
   },
   {
-    key: 'system', label: '系统', count: 25,
+    key: 'net', label: '网络', filter: '方法',
     rows: [
-      { seq: 89, op: 'dlopen', badge: 'evp', sub: '/usr/lib/libcrypto.dylib', time: '18:45:30.700',
-        detail: { title: 'dlopen()', fields: [['path', '/usr/lib/libcrypto.dylib'], ['handle', '0x2a1f0'], ['note', '触发 OpenSSL EVP hook 安装']], hex: '（模块加载事件）' } },
-      { seq: 83, op: 'dlsym', badge: 'symm', sub: '"CCCrypt" → wrapper', time: '18:45:28.310',
-        detail: { title: 'dlsym() · 重定向', fields: [['symbol', 'CCCrypt'], ['returned', 'hook_CCCrypt (wrapper)'], ['reason', '已 hook 符号，堵函数指针旁路']], hex: '（符号解析事件）' } },
-      { seq: 78, op: 'dlsym', badge: 'digest', sub: '"CC_MD5" → wrapper', time: '18:45:24.900',
-        detail: { title: 'dlsym() · 重定向', fields: [['symbol', 'CC_MD5'], ['returned', 'hook_CC_MD5 (wrapper)']], hex: '（符号解析事件）' } },
+      { seq: 141, cat: 'net', badge: '网络', algo: 'POST', op: '200 OK', time: '14:32:19.104', inLen: 34, outLen: 148, preview: 'http://127.0.0.1:8088/', input: '{"probe":"test","secret":"s3cr3t"}', output: 'HTTP/1.1 200 OK', stack: '0  Foundation  -[NSURLSession dataTaskWithRequest:]\n1  exercise_runner  test_network + 0xd4' },
+      { seq: 140, cat: 'net', badge: '网络', algo: 'X-Validator', op: 'request header', time: '14:32:19.099', inLen: 32, outLen: 44, preview: 'base64(SHA256(body))', input: '{"probe":"test","secret":"s3cr3t"}', output: '0P0DMvVWMaRirWPYYNw0H9G3dKXxFq9O…', stack: '0  exercise_runner  test_network + 0x88\n1  exercise_runner  main + 0x80' },
     ],
   },
   {
-    key: 'symbol', label: '符号', count: 42,
+    key: 'keychain', label: 'Keychain', filter: '操作',
     rows: [
-      { seq: '—', op: 'CCCrypt', badge: 'symm', sub: 'import · rebindable', time: 'bound',
-        detail: { title: 'CCCrypt', fields: [['kind', 'undefined import'], ['status', 'fishhook rebound'], ['image', 'MyApp']], hex: '__DATA,__la_symbol_ptr' } },
-      { seq: '—', op: 'CCHmac', badge: 'hmac', sub: 'import · rebindable', time: 'bound',
-        detail: { title: 'CCHmac', fields: [['kind', 'undefined import'], ['status', 'fishhook rebound']], hex: '__DATA,__la_symbol_ptr' } },
-      { seq: '—', op: 'SecKeyCreateSignature', badge: 'asym', sub: 'import · rebindable', time: 'bound',
-        detail: { title: 'SecKeyCreateSignature', fields: [['kind', 'undefined import'], ['status', 'fishhook rebound']], hex: '__DATA,__got' } },
+      { seq: 138, cat: 'keychain', badge: 'Keychain', algo: 'SecItemDelete', op: 'status=0', time: '14:32:18.930', inLen: 0, outLen: 0, preview: 'service=com.dh.probe.service · account=probe-account', input: 'generic password attributes', output: 'errSecSuccess', stack: '0  exercise_runner  test_keychain + 0x230\n1  exercise_runner  main + 0x70' },
+      { seq: 137, cat: 'keychain', badge: 'Keychain', algo: 'SecItemUpdate', op: 'status=0', time: '14:32:18.921', inLen: 17, outLen: 0, preview: 'kc-secret-ROTATED', input: 'kc-secret-ROTATED', output: 'errSecSuccess', stack: '0  exercise_runner  test_keychain + 0x1d4\n1  exercise_runner  main + 0x70' },
+      { seq: 136, cat: 'keychain', badge: 'Keychain', algo: 'SecItemCopyMatching', op: 'status=0', time: '14:32:18.913', inLen: 0, outLen: 22, preview: 'kc-secret-token-9f8e7d', input: 'service=com.dh.probe.service', output: 'kc-secret-token-9f8e7d', stack: '0  exercise_runner  test_keychain + 0x154\n1  exercise_runner  main + 0x70' },
+      { seq: 135, cat: 'keychain', badge: 'Keychain', algo: 'SecItemAdd', op: 'status=0', time: '14:32:18.904', inLen: 22, outLen: 0, preview: 'kc-secret-token-9f8e7d', input: 'kc-secret-token-9f8e7d', output: 'errSecSuccess', stack: '0  exercise_runner  test_keychain + 0xd0\n1  exercise_runner  main + 0x70' },
     ],
   },
   {
-    key: 'dump', label: 'Dump', count: 2,
+    key: 'files', label: '文件', filter: '路径',
     rows: [
-      { seq: '—', op: 'MyApp', badge: 'evp', sub: 'cryptid=1 · encrypted · 24.3 MB', time: 'ready',
-        detail: { title: '主程序 · MyApp', fields: [['load_address', '0x1029a8000'], ['cryptid', '1 (encrypted)'], ['action', '导出裸解密二进制 / 重打包 IPA']], hex: 'POST /api/dump?mode=ipa' } },
-      { seq: '—', op: 'Core.dylib', badge: 'symm', sub: 'cryptid=1 · Frameworks · 6.1 MB', time: 'ready',
-        detail: { title: 'Frameworks/Core.dylib', fields: [['load_address', '0x10a1c0000'], ['cryptid', '1 (encrypted)']], hex: 'POST /api/dump?mode=bin' } },
+      { seq: 6, cat: 'file', badge: '目录', algo: 'Documents', op: '目录', time: '刚刚', inLen: 0, outLen: 0, preview: 'iosdh_test.txt · 59 B', input: 'IOSDecryptHub file hook test - 文件操作测试数据', output: '', stack: '' },
+      { seq: 5, cat: 'file', badge: '文件', algo: 'iosdh_test.txt', op: '59 B', time: '刚刚', inLen: 59, outLen: 0, preview: 'Documents/iosdh_test.txt', input: 'IOSDecryptHub file hook test - 文件操作测试数据', output: '', stack: '' },
     ],
   },
+  { key: 'symbols', label: '符号', filter: '镜像', rows: [
+    { seq: 4, cat: 'sys', badge: 'Mach-O', algo: 'CryptoTestHost', op: '42 imports', time: 'bound', inLen: 0, outLen: 0, preview: 'CCCrypt · CCHmac · CC_SHA256 · SecKeyCreateSignature', input: 'CCCrypt\nCCHmac\nCC_SHA256\nSecKeyCreateSignature\nSecItemAdd', output: 'fishhook rebindable', stack: '' },
+    { seq: 3, cat: 'sys', badge: 'dylib', algo: 'decrypt_helper.dylib', op: '124 hooks', time: 'loaded', inLen: 0, outLen: 0, preview: 'all hook health checks passed', input: 'arm64 · Mach-O 64-bit dynamically linked shared library', output: '124 / 124 installed', stack: '' },
+  ] },
+  { key: 'dump', label: 'Dump', filter: '镜像', rows: [
+    { seq: 2, cat: 'sys', badge: 'Mach-O', algo: 'CryptoTestHost', op: '可导出', time: 'ready', inLen: 0, outLen: 0, preview: 'cryptid=1 · 24.3 MB · arm64', input: 'load_address: 0x1029a8000\ncryptoff: 0x4000\ncryptsize: 0x16a0000', output: '裸解密二进制 / 可重签 IPA', stack: '' },
+  ] },
 ];
 
 function initMockPanel() {
   const host = $('#mock-panel');
   host.innerHTML = `
-    <div class="mock__top">
-      <span class="mock__logo">IOSDecryptHub</span>
-      <span class="mock__run">运行中</span>
-      <div class="mock__proc">
-        <span>Crypto Test · <b>com.taisuii.cryptotesthost</b></span>
-        <span>PID <b>73582</b></span>
-        <span>iOS <b>26.3.1</b></span>
-        <span>arm64 · <b>16 GB</b></span>
+    <div class="rc__header">
+      <div class="rc__brand"><span class="rc__mark">DH</span><b>IOSDecryptHub</b><span>Runtime Console</span></div>
+      <div class="rc__stats"><i></i><b id="rc-total">141</b> 条 · hooks <b>124/124</b></div>
+      <div class="rc__actions">
+        <label><input type="checkbox" id="rc-auto" checked> 自动刷新</label>
+        <button type="button" data-demo-action="download">下载全部日志</button>
+        <button type="button" data-demo-action="diag">审查日志</button>
+        <button type="button" data-demo-action="mcp">MCP</button>
+        <button type="button" class="primary" data-demo-action="settings">设置</button>
       </div>
     </div>
-    <div class="mock__tabs" id="mock-tabs"></div>
-    <div class="mock__body">
-      <div class="mock__list" id="mock-list"></div>
-      <div class="mock__detail" id="mock-detail"></div>
+    <div class="rc__proc"><span class="rc__appicon">CT</span><b>Crypto Test</b><span>com.taisuii.cryptotesthost</span><span>PID <b>73582</b></span><span>iOS <b>18.5</b></span><span>iPhone 16 Pro</span><span>RAM <b>8192 MB</b></span></div>
+    <div class="rc__tabs" id="mock-tabs"></div>
+    <div class="rc__toolbar">
+      <div class="rc__filters"><label id="rc-filter-label">分类</label><select id="rc-cat"><option value="all">全部</option></select><input id="rc-search" type="search" placeholder="搜索本类: 算法/路径/明文/Hex…"><span class="rc__size"><label>输入大小</label><input id="rc-min" type="number" min="0" placeholder="0"><span>—</span><input id="rc-max" type="number" min="0" placeholder="不限"><span>B</span></span></div>
+      <div class="rc__toolbar-actions"><button type="button" class="warn" id="rc-pause">暂停</button><button type="button" data-demo-action="tab-download">下载本类</button><button type="button" class="danger" id="rc-clear">清空本类</button><button type="button" id="rc-noise">查看噪声 <b>1</b></button><span id="rc-count"></span></div>
+    </div>
+    <div class="rc__workspace">
+      <div class="rc__list" id="mock-list"></div>
+      <div class="rc__splitter"></div>
+      <div class="rc__detail" id="mock-detail"></div>
     </div>`;
 
   const tabsHost = $('#mock-tabs', host);
   const list = $('#mock-list', host);
   const detail = $('#mock-detail', host);
+  const search = $('#rc-search', host);
+  const catSelect = $('#rc-cat', host);
+  const minInput = $('#rc-min', host);
+  const maxInput = $('#rc-max', host);
+  const count = $('#rc-count', host);
+  let activeTab = PANEL_TABS[0];
+  let selectedSeq = null;
+  let paused = false;
 
   PANEL_TABS.forEach((tab, ti) => {
-    const btn = el('button', 'mtab' + (ti === 0 ? ' active' : ''), `${tab.label}<b>${tab.count}</b>`);
+    const btn = el('button', 'rc__tab' + (ti === 0 ? ' active' : ''), `${tab.label}<b>${tab.rows.length}</b>`);
     btn.addEventListener('click', () => {
-      $$('.mtab', tabsHost).forEach((b) => b.classList.remove('active'));
+      $$('.rc__tab', tabsHost).forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
+      activeTab = tab;
+      search.value = '';
+      minInput.value = '';
+      maxInput.value = '';
+      $('#rc-filter-label', host).textContent = tab.filter;
+      updateCategories(tab);
       loadTab(tab);
     });
     tabsHost.appendChild(btn);
   });
 
+  function escapeText(value = '') {
+    return String(value).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  }
+
+  function hexDump(text) {
+    if (!text) return '（无数据）';
+    const bytes = new TextEncoder().encode(text).slice(0, 64);
+    const hex = [...bytes].map((b) => b.toString(16).padStart(2, '0'));
+    const rows = [];
+    for (let i = 0; i < hex.length; i += 16) {
+      const chunk = hex.slice(i, i + 16);
+      const ascii = [...bytes.slice(i, i + 16)].map((b) => (b >= 32 && b <= 126 ? String.fromCharCode(b) : '.')).join('');
+      rows.push(`${i.toString(16).padStart(6, '0')}: ${chunk.join(' ').padEnd(47)}  |${ascii}|`);
+    }
+    return rows.join('\n');
+  }
+
   function renderRowDetail(d) {
     detail.innerHTML = `
-      <div class="det__head"><h4>${d.title}</h4></div>
-      <div class="det__body">
-        ${d.fields.map(([k, v]) => `<div class="det__row"><span class="det__k">${k}</span><span class="det__v ${k === 'plain' || k === 'pass' || k === 'preview' ? 'plain' : ''}">${v}</span></div>`).join('')}
-        <div class="det__block"><div class="det__blabel">HEXDUMP / 数据</div><pre class="det__hex">${d.hex}</pre></div>
-      </div>`;
+      <div class="rcd__head"><h4><i class="cat-${d.cat}"></i>#${d.seq} ${escapeText(d.algo)}</h4><p>${escapeText(d.op)} · ${escapeText(d.time)}</p><div><button type="button" data-copy-detail>复制整条</button>${d.input ? '<button type="button" data-copy-input>复制明文</button>' : ''}</div></div>
+      ${d.key ? `<section class="rcd__kv"><b>KEY / IV</b><pre>${escapeText(d.key)}${d.iv ? `\n${escapeText(d.iv)}` : ''}</pre></section>` : ''}
+      ${d.input ? `<section class="rcd__io input"><b>输入 / INPUT</b><span>${d.inLen} bytes</span><h5>UTF-8</h5><pre>${escapeText(d.input)}</pre><h5>HexDump</h5><pre>${escapeText(hexDump(d.input))}</pre></section>` : ''}
+      ${d.output ? `<section class="rcd__io output"><b>输出 / OUTPUT</b><span>${d.outLen} bytes</span><pre>${escapeText(d.output)}</pre></section>` : ''}
+      ${d.stack ? `<details class="rcd__stack"><summary>调用栈（${d.stack.split('\n').length} 帧）</summary><pre>${escapeText(d.stack)}</pre></details>` : ''}`;
+    $('[data-copy-detail]', detail)?.addEventListener('click', (event) => copyDemo(`${d.algo}\n${d.input}\n${d.output}`, event.currentTarget));
+    $('[data-copy-input]', detail)?.addEventListener('click', (event) => copyDemo(d.input, event.currentTarget));
+  }
+
+  function updateCategories(tab) {
+    const cats = [...new Set(tab.rows.map((row) => row.cat))];
+    catSelect.innerHTML = '<option value="all">全部</option>' + cats.map((cat) => `<option value="${cat}">${({ digest: '摘要', hmac: 'HMAC', symm: '对称', asym: '非对称', kdf: 'KDF', file: '文件', sys: '系统', net: '网络', keychain: 'Keychain' })[cat] || cat}</option>`).join('');
+  }
+
+  function filteredRows(tab) {
+    const q = search.value.trim().toLowerCase();
+    const min = Number(minInput.value || 0);
+    const max = Number(maxInput.value || 0);
+    return tab.rows.filter((row) => (catSelect.value === 'all' || row.cat === catSelect.value)
+      && (!q || `${row.algo} ${row.op} ${row.preview} ${row.input} ${row.output}`.toLowerCase().includes(q))
+      && row.inLen >= min && (!max || row.inLen <= max));
   }
 
   function loadTab(tab) {
     list.innerHTML = '';
-    tab.rows.forEach((r, ri) => {
-      const row = el('div', 'mrow' + (ri === 0 ? ' active' : ''));
+    const rows = filteredRows(tab);
+    count.textContent = `${rows.length} / ${tab.rows.length}`;
+    if (!rows.length) {
+      list.innerHTML = '<div class="rc__empty">没有匹配记录</div>';
+      detail.innerHTML = '<div class="rc__empty">调整筛选条件后查看详情</div>';
+      return;
+    }
+    rows.forEach((r, ri) => {
+      const selected = selectedSeq === r.seq || (!selectedSeq && ri === 0);
+      const row = el('button', `rcrow cat-${r.cat}${selected ? ' selected' : ''}`);
       row.innerHTML = `
-        <div class="mrow__top">
-          <span class="mrow__seq">${r.seq === '—' ? '' : '#' + r.seq}</span>
-          <span class="fcard__badge b-${r.badge}">${tab.label}</span>
-          <span class="mrow__op">${r.op}</span>
-          <span class="mrow__time">${r.time}</span>
-        </div>
-        <div class="mrow__sub">${r.sub}</div>`;
+        <span class="rcrow__top"><span class="rcrow__seq">#${r.seq}</span><span class="rcrow__pill ${r.cat}">${r.badge}</span><strong>${r.algo}</strong><span>${r.op}</span><time>${r.time}</time></span>
+        <span class="rcrow__meta">in:${r.inLen}B · out:${r.outLen}B</span><span class="rcrow__preview">${r.preview}</span>`;
       row.addEventListener('click', () => {
-        $$('.mrow', list).forEach((n) => n.classList.remove('active'));
-        row.classList.add('active');
-        renderRowDetail(r.detail);
+        selectedSeq = r.seq;
+        $$('.rcrow', list).forEach((n) => n.classList.remove('selected'));
+        row.classList.add('selected');
+        renderRowDetail(r);
       });
       list.appendChild(row);
     });
-    renderRowDetail(tab.rows[0].detail);
+    const selected = rows.find((row) => row.seq === selectedSeq) || rows[0];
+    selectedSeq = selected.seq;
+    renderRowDetail(selected);
   }
 
+  function copyDemo(text, button) {
+    navigator.clipboard?.writeText(text).catch(() => {});
+    const previous = button.textContent;
+    button.textContent = '已复制';
+    setTimeout(() => { button.textContent = previous; }, 1200);
+  }
+
+  [search, catSelect, minInput, maxInput].forEach((control) => control.addEventListener('input', () => { selectedSeq = null; loadTab(activeTab); }));
+  $('#rc-pause', host).addEventListener('click', (event) => {
+    paused = !paused;
+    event.currentTarget.textContent = paused ? '继续' : '暂停';
+    event.currentTarget.classList.toggle('active', paused);
+    $('.rc__stats i', host).className = paused ? 'paused' : '';
+  });
+  $('#rc-clear', host).addEventListener('click', () => {
+    list.innerHTML = '<div class="rc__empty">演示面板不会删除测试数据</div>';
+    detail.innerHTML = '<div class="rc__empty">插件中清空仅影响内存，落盘日志仍可下载</div>';
+    count.textContent = `0 / ${activeTab.rows.length}`;
+  });
+  $('#rc-noise', host).addEventListener('click', () => {
+    search.value = 'MGCopyAnswer';
+    list.innerHTML = '<button class="rcrow cat-digest selected"><span class="rcrow__top"><span class="rcrow__seq">#110</span><span class="rcrow__pill digest">摘要</span><strong>MD5</strong><span>噪声</span><time>14:32:18.407</time></span><span class="rcrow__preview">MGCopyAnswerapple-internal-install</span></button>';
+    detail.innerHTML = '<div class="rc__empty">该事件命中默认噪声特征，已从主事件流分流。</div>';
+    count.textContent = '1 / 1';
+  });
+  $$('[data-demo-action]', host).forEach((button) => button.addEventListener('click', () => {
+    const label = button.dataset.demoAction;
+    if (label === 'tab-download' || label === 'download') {
+      const blob = new Blob([JSON.stringify(activeTab.rows, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob); link.download = `iosdecrypthub-${activeTab.key}.json`; link.click();
+      URL.revokeObjectURL(link.href);
+      return;
+    }
+    detail.innerHTML = `<div class="rc__empty"><b>${button.textContent.trim()}</b><br>官网演示保留与插件一致的入口；连接设备后由 8088 服务返回真实内容。</div>`;
+  }));
+
+  updateCategories(PANEL_TABS[0]);
   loadTab(PANEL_TABS[0]);
 }
 
@@ -412,7 +453,6 @@ function boot() {
   initNav();
   initMarquee();
   initCaps();
-  initFeed();
   initMockPanel();
   initAlgorithms();
   initDump();
