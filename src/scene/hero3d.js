@@ -21,10 +21,10 @@ export function initHero3D(canvas) {
   const root = new THREE.Group();
   scene.add(root);
 
-  // 黑白场景: 墨黑主线 + 灰色粒子 (对应设计系统 #0d0d0d / #8c8c8c)
-  const MINT = new THREE.Color(0x0d0d0d);
-  const MINT_D = new THREE.Color(0x8c8c8c);
-  const BLUE = new THREE.Color(0x8c8c8c);
+  const MINT = new THREE.Color(0x40e0c4);
+  const MINT_D = new THREE.Color(0x0b7f7a);
+  const BLUE = new THREE.Color(0x4db7ff);
+  const AMBER = new THREE.Color(0xffc66d);
 
   // --- core: icosahedron wireframe ---
   const coreGeo = new THREE.IcosahedronGeometry(2.15, 1);
@@ -51,6 +51,7 @@ export function initHero3D(canvas) {
   const COUNT = 620;
   const parr = new Float32Array(COUNT * 3);
   const carr = new Float32Array(COUNT * 3);
+  const seeds = new Float32Array(COUNT);
   for (let i = 0; i < COUNT; i++) {
     const r = 3.1 + Math.random() * 3.4;
     const theta = Math.random() * Math.PI * 2;
@@ -58,7 +59,8 @@ export function initHero3D(canvas) {
     parr[i * 3] = r * Math.sin(phi) * Math.cos(theta);
     parr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
     parr[i * 3 + 2] = r * Math.cos(phi);
-    const c = Math.random() < 0.35 ? MINT : BLUE;
+    seeds[i] = Math.random();
+    const c = seeds[i] < 0.34 ? MINT : seeds[i] < 0.72 ? BLUE : AMBER;
     carr[i * 3] = c.r; carr[i * 3 + 1] = c.g; carr[i * 3 + 2] = c.b;
   }
   const fieldGeo = new THREE.BufferGeometry();
