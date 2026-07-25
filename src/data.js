@@ -268,26 +268,7 @@ export const MCP_TOOLS = [
     { board: 'crypto' }, { board: 'crypto', diag: '[14:32:17] digest hooks 24/24\n[14:32:17] symmetric hooks 6/6', unhooked: '' }),
 ];
 
-export const START_STEPS = [
-  { b: '编译出 dylib', p: '一条命令产出 <code>decrypt_helper.dylib</code>，只编 ARM/AArch64，约 2MB。' },
-  { b: '注入目标 IPA', p: '脚本用 insert_dylib 写入 LC_LOAD_DYLIB，产出 <code>hooked_&lt;input&gt;.ipa</code>。' },
-  { b: '打开面板', p: '安装运行后浏览器访问 <code>http://&lt;设备IP&gt;:8088</code>，事件实时流出。' },
-];
 
-export const START_TABS = [
-  {
-    name: '编译',
-    code: '<span class="c"># iOS 真机 (arm64, iPhoneOS SDK)</span>\nmake\n\n<span class="c"># macOS 原生灰度自测</span>\nmake mac\n\n<span class="c"># iOS 模拟器 + 一键部署测试 App</span>\nmake sim-install',
-  },
-  {
-    name: '注入',
-    code: '<span class="c"># 写入 LC_LOAD_DYLIB → hooked_&lt;input&gt;.ipa</span>\n<span class="p">./scripts/inject.sh</span> <span class="s">app.ipa</span> decrypt_helper.dylib\n\n<span class="c"># 非越狱：AltStore / Sideloadly 重签后安装</span>\n<span class="c"># 越狱设备：可直接安装</span>',
-  },
-  {
-    name: '打开面板',
-    code: '<span class="c"># dylib 加载后自动起 HTTP 服务</span>\nopen <span class="s">http://&lt;设备IP&gt;:8088</span>\n\n<span class="c"># AI 客户端接 MCP（复用同端口）</span>\nPOST <span class="s">http://&lt;设备IP&gt;:8088/api/mcp</span>',
-  },
-];
 
 export const TERM_LINES = [
   { t: '$ ./scripts/inject.sh Target.ipa decrypt_helper.dylib', c: '' },

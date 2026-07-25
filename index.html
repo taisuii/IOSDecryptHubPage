@@ -46,7 +46,6 @@
         <a href="#algorithms">算法覆盖</a>
         <a href="#dump">砸壳</a>
         <a href="#mcp">MCP 分析</a>
-        <a href="#start">上手</a>
       </nav>
       <a
         class="nav__cta"
@@ -86,7 +85,6 @@
                 看它能捕获什么
                 <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M4 10h11m0 0-4-4m4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </a>
-              <a class="btn btn--ghost" href="#start">快速上手</a>
             </div>
             <dl class="hero__stats reveal">
               <div><dt data-count="20" data-suffix="+">0</dt><dd>拦截算法族</dd></div>
@@ -212,52 +210,6 @@
         </div>
       </section>
 
-      <!-- ================= HEALTH / FAIL-LOUD ================= -->
-      <section class="section" id="health">
-        <div class="wrap band reveal">
-          <div class="band__copy">
-            <span class="head__kicker">06 — fail-loud</span>
-            <h2 class="head__title">失效就让它可见，绝不静默兜底</h2>
-            <p class="head__lead">
-              hook 框架最怕「时好时坏」。每个模块安装后立即自检，没挂上的符号被记录；
-              HTTP 起不来、落盘失败、流式加密遇到未跟踪的上下文都会上报——
-              悬浮窗红字、面板红色横幅、控制台 <code>[IOSDecryptHub/ERR]</code> 三处同时可见，但不中止宿主 App。
-            </p>
-          </div>
-          <div class="band__health">
-            <div class="hbar"><span>hooks</span><b class="ok">124 / 124 已挂载</b></div>
-            <div class="hbar"><span>http :8088</span><b class="ok">listening</b></div>
-            <div class="hbar"><span>log sink</span><b class="ok">flushing</b></div>
-            <div class="hbar hbar--warn"><span>MD2 / MD4</span><b class="warn">skipped · 系统已移除</b></div>
-            <code class="band__api">GET /api/stats → { health: { hookFailures: 0, sink: "ok" } }</code>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= GET STARTED ================= -->
-      <section class="section section--alt" id="start">
-        <div class="wrap">
-          <header class="head reveal">
-            <span class="head__kicker">07 — 上手</span>
-            <h2 class="head__title">三步：编译 · 注入 · 打开面板</h2>
-            <p class="head__lead">
-              越狱设备可直接安装；非越狱设备用 AltStore / Sideloadly 重签后安装。产物是单个 dylib。
-            </p>
-          </header>
-          <div class="start reveal">
-            <ol class="start__steps" id="start-steps"></ol>
-            <div class="start__card">
-              <div class="start__tabs" id="start-tabs"></div>
-              <pre class="start__code" id="start-code"></pre>
-              <button class="start__copy" id="start-copy" type="button">复制命令</button>
-            </div>
-          </div>
-          <p class="note reveal">
-            安全提示：Web 与 MCP 服务均无认证、监听 0.0.0.0，会把 Key 与明文暴露给同网络中任何能连接的人。
-            仅在可信网络中调试使用；砸壳与分发受版权保护的程序可能违法，仅限授权安全测试与自有 App。
-          </p>
-        </div>
-      </section>
     </main>
 
     <!-- ================= FOOTER ================= -->
@@ -271,7 +223,6 @@
           <a href="https://github.com/taisuii/ios-decrypt-helper" target="_blank" rel="noreferrer">源码仓库</a>
           <a href="https://github.com/taisuii/ios-decrypt-helper/issues/new/choose" target="_blank" rel="noreferrer">反馈 Issue</a>
           <a href="#capabilities">能力</a>
-          <a href="#start">上手</a>
         </div>
       </div>
       <div class="wrap foot__base">
