@@ -268,38 +268,94 @@ function initMockPanel() {
       && r.inLen >= min && (!max || r.inLen <= max));
   }
 
+  /* ---- hex helpers ---- */
+  function _isHex(s) { return s && /^[0-9a-fA-F]+$/.test(s) && s.length % 2 === 0; }
+  function _hex2str(hex) {
+    let s = '';
+    for (let i = 0; i < hex.length; i += 2) {
+      const b = parseInt(hex.substring(i, i + 2), 16);
+      if (b < 32 || b > 126) return null; // not printable
+      s += String.fromCharCode(b);
+    }
+    return s;
+  }
+  function _str2hex(s) {
+    let h = '';
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charCodeAt(i);
+      if (c < 128) h += c.toString(16).padStart(2, '0');
+      else if (c < 2048) h += ((c >> 6) | 0xc0).toString(16).padStart(2, '0') + ((c & 0x3f) | 0x80).toString(16).padStart(2, '0');
+      else h += ((c >> 12) | 0xe0).toString(16).padStart(2, '0') + (((c >> 6) & 0x3f) | 0x80).toString(16).padStart(2, '0') + ((c & 0x3f) | 0x80).toString(16).padStart(2, '0');
+    }
+    return h;
+  }
+  function _hex2dump(hex) {
+    let r = '';
+    for (let i = 0; i < hex.length; i += 32) {
+      const off = (i / 2).toString(16).padStart(6, '0') + ': ';
+      const chunk = hex.substring(i, i + 32);
+      let h = '', a = '';
+      for (let j = 0; j < chunk.length; j += 2) {
+        if (j > 0 && j % 8 === 0) h += ' ';
+        h += chunk[j] + chunk[j + 1] + ' ';
+        const b = parseInt(chunk.substring(j, j + 2), 16);
+        a += (b >= 32 && b < 127) ? String.fromCharCode(b) : '.';
+      }
+      r += off + h.padEnd(40, ' ') + ' |' + a + '|\n';
+    }
+    return r.trimEnd();
+  }
+  function _esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  function _ioBody(byteLen, raw) {
+    if (!raw && byteLen === 0) return '<div class="rc__io-meta">0 bytes</div>';
+    const isHex = _isHex(raw);
+    const hex = isHex ? raw : _str2hex(raw || '');
+    const utf8 = isHex ? _hex2str(raw) : raw;
+    const dump = _hex2dump(hex);
+    let b = '<div class="rc__io-meta">' + byteLen + ' bytes</div>';
+    if (utf8) b += '<h3>UTF-8</h3><pre class="rc__pre">' + _esc(utf8) + '</pre>';
+    b += '<h3>Hex</h3><pre class="rc__pre rc__pre--hex">' + _esc(hex) + '</pre>';
+    if (dump) b += '<h3>HexDump</h3><pre class="rc__pre rc__pre--hex rc__pre--dump">' + _esc(dump) + '</pre>';
+    return b;
+  }
+
   /* ---- render detail ---- */
   function renderDetail(r) {
-    const catMap = { digest: '摘要', hmac: 'HMAC', symm: '对称', asym: '非对称', kdf: 'KDF', file: '文件', sys: '系统', net: '网络', keychain: 'Keychain' };
-    let html = `<div class="rc__detail-head">
-      <span class="rcrow__pill ${r.cat}">${r.badge}</span>
-      <strong>${r.algo}</strong>
-      <span class="rc__detail-op">${r.op}</span>
-      <span class="rc__detail-seq">#${r.seq}</span>
-    </div>
-    <div class="rc__detail-time">${r.time}</div>`;
+    const catCls = r.cat;
+    let html = '<div class="rc__detail-head">' +
+      '<h2><span class="rc__cat-dot ' + catCls + '"></span>#' + r.seq + '  ' + _esc(r.algo) + '</h2>' +
+      '<div class="rc__detail-sub">' + _esc(r.op) + ' · ' + _esc(r.time) + '</div>' +
+      '<div class="rc__detail-actions">' +
+        '<button type="button" class="rc__copy-btn" data-copyall="' + r.seq + '">复制整条</button>' +
+        (r.input ? '<button type="button" class="rc__copy-btn" data-copyfield="input">复制明文</button>' : '') +
+        (r.input ? '<button type="button" class="rc__copy-btn" data-copyfield="input-hex">复制 Hex</button>' : '') +
+      '</div></div>';
 
-    if (r.key) html += `<h4>Key</h4><pre class="rc__pre">${r.key}</pre>`;
-    if (r.iv)  html += `<h4>IV</h4><pre class="rc__pre">${r.iv}</pre>`;
-    html += `<h4>Input (${r.inLen} B)</h4><pre class="rc__pre">${r.input || '(empty)'}</pre>`;
-    html += `<h4>Output (${r.outLen} B)</h4><pre class="rc__pre">${r.output || '(empty)'}</pre>`;
-    html += `<h4>调用栈</h4><pre class="rc__pre rc__pre--stack">${r.stack}</pre>`;
-    html += `<div class="rc__detail-actions">
-      <button type="button" class="rc__copy-btn" data-copy="${encodeURIComponent(JSON.stringify(r))}">复制 JSON</button>
-    </div>`;
+    if (r.key) html += '<div class="rc__io-section rc__io-kv"><div class="rc__io-label rc__io-label--kv">KEY</div><pre class="rc__pre rc__pre--hex">' + _esc(r.key) + '</pre></div>';
+    if (r.iv)  html += '<div class="rc__io-section rc__io-kv"><div class="rc__io-label rc__io-label--kv">IV</div><pre class="rc__pre rc__pre--hex">' + _esc(r.iv) + '</pre></div>';
+    html += '<div class="rc__io-section rc__io-in"><div class="rc__io-label rc__io-label--in">输入 / INPUT</div>' + _ioBody(r.inLen, r.input) + '</div>';
+    html += '<div class="rc__io-section rc__io-out"><div class="rc__io-label rc__io-label--out">输出 / OUTPUT</div>' + _ioBody(r.outLen, r.output) + '</div>';
+    html += '<details class="rc__callstack"><summary>调用栈 (' + (r.stack || '').split('\n').filter(Boolean).length + ' 帧)</summary><pre class="rc__pre rc__pre--stack">' + _esc(r.stack) + '</pre></details>';
     detail.innerHTML = html;
 
-    /* copy button */
-    const copyBtn = $('.rc__copy-btn', detail);
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        const text = decodeURIComponent(copyBtn.dataset.copy);
+    /* copy buttons */
+    detail.querySelectorAll('.rc__copy-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        let text = '';
+        if (btn.dataset.copyall) {
+          text = JSON.stringify(r, null, 2);
+        } else if (btn.dataset.copyfield === 'input') {
+          text = _isHex(r.input) ? (_hex2str(r.input) || r.input) : (r.input || '');
+        } else if (btn.dataset.copyfield === 'input-hex') {
+          text = _isHex(r.input) ? r.input : _str2hex(r.input || '');
+        }
         navigator.clipboard?.writeText(text).catch(() => {});
-        const prev = copyBtn.textContent;
-        copyBtn.textContent = '已复制';
-        setTimeout(() => { copyBtn.textContent = prev; }, 1200);
+        const prev = btn.textContent;
+        btn.textContent = '已复制';
+        setTimeout(() => { btn.textContent = prev; }, 1200);
       });
-    }
+    });
   }
 
   /* ---- render list ---- */
