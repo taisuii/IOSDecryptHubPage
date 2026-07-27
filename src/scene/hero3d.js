@@ -294,6 +294,7 @@ export function initHero3D(canvas) {
 
   let eyeMesh = null;
   let pupilMesh = null;
+  let pupilOrigin = null;
   let eyeGlow = null;
   let eyeSpark = null;
   for (const p of RAVEN_PLATES) {
@@ -337,6 +338,7 @@ export function initHero3D(canvas) {
       mesh.position.set(c.x, c.y, p.z);
       if (p.pupil) {
         pupilMesh = mesh;
+        pupilOrigin = mesh.position.clone();
       } else {
         eyeMesh = mesh;
         // Crimson ring keeps the pupil dark; the tiny white point reads as a wet highlight.
@@ -474,8 +476,10 @@ export function initHero3D(canvas) {
     });
     const mesh = new THREE.Mesh(scrapGeo, mat);
     let x = (Math.random() - 0.5) * 11.5;
+    const y = (Math.random() - 0.5) * 7.4;
     if (x < -2.6 && Math.random() < 0.55) x += 4.5; // keep the copy side airy
-    mesh.position.set(x, (Math.random() - 0.5) * 7.4, -1.2 + Math.random() * 2.8);
+    if (y > 1.25 && x > -1.7 && x < 2.3) x += x < 0 ? -2.5 : 2.5; // never cross the face
+    mesh.position.set(x, y, -1.2 + Math.random() * 2.8);
     mesh.rotation.set(Math.random() * 0.6, Math.random() * 0.6, Math.random() * Math.PI);
     mesh.userData = {
       baseX: x,
@@ -488,18 +492,31 @@ export function initHero3D(canvas) {
     gNear.add(mesh);
   }
 
-  // ---- interaction: diorama parallax ---------------------------------------
+  // ---- interaction: diorama parallax + restrained eye tracking -------------
   const target = { x: 0, y: 0 };
   const cur = { x: 0, y: 0 };
+  const eyeTarget = { x: 0, y: 0 };
+  const eyeLook = { x: 0, y: 0 };
+
   if (!reduce) {
     window.addEventListener(
       'pointermove',
       (e) => {
         target.x = (e.clientX / window.innerWidth) * 2 - 1;
         target.y = (e.clientY / window.innerHeight) * 2 - 1;
+        if (e.pointerType !== 'touch') {
+          eyeTarget.x = THREE.MathUtils.clamp(target.x, -1, 1);
+          eyeTarget.y = THREE.MathUtils.clamp(-target.y, -1, 1);
+        }
       },
       { passive: true }
     );
+    window.addEventListener('pointerleave', () => {
+      target.x = 0;
+      target.y = 0;
+      eyeTarget.x = 0;
+      eyeTarget.y = 0;
+    });
   }
 
   function resize() {
@@ -533,6 +550,8 @@ export function initHero3D(canvas) {
 
     cur.x += (target.x - cur.x) * 0.045;
     cur.y += (target.y - cur.y) * 0.045;
+    eyeLook.x += (eyeTarget.x - eyeLook.x) * 0.11;
+    eyeLook.y += (eyeTarget.y - eyeLook.y) * 0.11;
 
     // depth parallax —— far layers lag, near layers lead
     root.rotation.y = cur.x * 0.03;
@@ -554,6 +573,10 @@ export function initHero3D(canvas) {
       eyeMesh.material.emissiveIntensity = 0.9 + pulse * 0.25;
       if (eyeGlow) eyeGlow.material.opacity = 0.32 + pulse * 0.2;
       if (eyeSpark) eyeSpark.material.opacity = 0.5 + pulse * 0.28;
+      if (pupilMesh && pupilOrigin) {
+        pupilMesh.position.x = pupilOrigin.x + eyeLook.x * 0.52;
+        pupilMesh.position.y = pupilOrigin.y + eyeLook.y * 0.4;
+      }
       if (t > nextBlink) {
         blinkT = 0;
         nextBlink = t + 4 + Math.random() * 4;
