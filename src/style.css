@@ -439,7 +439,7 @@ code, pre { font-family: var(--mono); }
   .hero__inner { padding-top: 96px; padding-bottom: 16px; }
   .hero__canvas { opacity: .5; }
   .hero__title { margin-top: 20px; font-size: 42px; line-height: 1.05; }
-  .hero__sub { font-size: 14px; line-height: 1.75; }
+  .hero__sub { max-width: calc(100% - 38px); font-size: 14px; line-height: 1.75; }
   .hero__cta { margin-top: 24px; }
   .btn { padding: 0 14px; font-size: 12px; }
   .hero__stats { grid-template-columns: repeat(2, 1fr); row-gap: 18px; }

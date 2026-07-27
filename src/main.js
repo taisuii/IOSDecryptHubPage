@@ -49,7 +49,7 @@ function initCounters() {
       if (reduce) { node.textContent = end + suffix; return; }
       const dur = 1200; const t0 = performance.now();
       const step = (now) => {
-        const p = Math.min((now - t0) / dur, 1);
+        const p = Math.max(0, Math.min((now - t0) / dur, 1));
         const eased = 1 - Math.pow(1 - p, 3);
         node.textContent = Math.round(end * eased) + suffix;
         if (p < 1) requestAnimationFrame(step);
