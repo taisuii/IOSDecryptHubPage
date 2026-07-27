@@ -118,10 +118,18 @@ export function initHero3D(canvas) {
 
   function updateRaven(time, delta) {
     raven.idle.position.y = Math.sin(time * 0.7) * 0.09;
-    raven.idle.rotation.y = Math.sin(time * 0.24) * 0.16;
-    raven.idle.rotation.z = Math.sin(time * 0.5) * 0.022;
-    raven.idle.rotation.x = Math.sin(time * 0.33) * 0.035;
+    raven.idle.rotation.y = Math.sin(time * 0.24) * 0.065;
+    raven.idle.rotation.z = Math.sin(time * 0.5) * 0.012;
+    raven.idle.rotation.x = Math.sin(time * 0.33) * 0.018;
     raven.idle.scale.setScalar(1 - 0.07 * Math.exp(-time * 1.5));
+
+    const breath = Math.sin(time * 0.82);
+    raven.groups.head.rotation.y = eyeLook.x * 0.052;
+    raven.groups.head.rotation.z = eyeLook.y * 0.024 + Math.sin(time * 0.38) * 0.008;
+    raven.groups.neck.rotation.z = Math.sin(time * 0.66 + 0.8) * 0.012;
+    raven.groups.wing.rotation.z = Math.sin(time * 0.57 + 1.4) * 0.01;
+    raven.groups.chest.scale.set(1 + breath * 0.007, 1 + breath * 0.012, 1);
+    raven.groups.tail.rotation.z = Math.sin(time * 0.43 + 2.1) * 0.009;
 
     if (!raven.eyeMesh) return;
     const pulse = 0.5 + 0.5 * Math.sin(time * 2.1);
