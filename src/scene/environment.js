@@ -114,7 +114,7 @@ function createDust(farGroup) {
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  farGroup.add(new THREE.Points(
+  const points = new THREE.Points(
     geometry,
     new THREE.PointsMaterial({
       color: 0xb9c2d6,
@@ -124,8 +124,9 @@ function createDust(farGroup) {
       depthWrite: false,
       sizeAttenuation: true,
     })
-  ));
-  return { geometry, count };
+  );
+  farGroup.add(points);
+  return { geometry, count, points };
 }
 
 function createScraps(nearGroup) {
@@ -161,9 +162,12 @@ function createScraps(nearGroup) {
     mesh.userData = {
       baseX: x,
       y,
+      baseOpacity: mesh.material.opacity,
       vy: 0.1 + Math.random() * 0.17,
       phase: Math.random() * Math.PI * 2,
       rz: (Math.random() - 0.5) * 0.35,
+      gatherX: (Math.random() - 0.5) * 0.7,
+      gatherY: (Math.random() - 0.5) * 0.35,
     };
     scraps.push(mesh);
     nearGroup.add(mesh);
@@ -181,6 +185,7 @@ export function createHeroEnvironment({ farGroup, nearGroup }) {
     banks,
     dustGeometry: dust.geometry,
     dustCount: dust.count,
+    dustPoints: dust.points,
     scraps,
   };
 }

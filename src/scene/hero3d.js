@@ -17,7 +17,8 @@ function createRenderer(canvas) {
 }
 
 function addSceneLights(scene) {
-  scene.add(new THREE.AmbientLight(0x30384a, 0.6));
+  const ambient = new THREE.AmbientLight(0x30384a, 0.6);
+  scene.add(ambient);
 
   const key = new THREE.DirectionalLight(0xe6ecff, 2.3);
   key.position.set(-5, 7, 6);
@@ -30,7 +31,7 @@ function addSceneLights(scene) {
   const moonGlow = new THREE.PointLight(0xffe2b0, 5, 11, 2);
   moonGlow.position.set(2.7, 1.7, -1.2);
   scene.add(moonGlow);
-  return moonGlow;
+  return { ambient, key, rim, moonGlow };
 }
 
 export function initHero3D(canvas) {
@@ -53,14 +54,33 @@ export function initHero3D(canvas) {
   root.add(farGroup, midGroup, nearGroup);
   scene.add(root);
 
-  const moonGlow = addSceneLights(scene);
+  const lights = addSceneLights(scene);
   const raven = createRavenModel(midGroup);
   const environment = createHeroEnvironment({ farGroup, nearGroup });
+  const hero = canvas.closest('.hero');
+  const scanTrigger = hero?.querySelector('.btn--primary');
 
   const pointerTarget = { x: 0, y: 0 };
   const pointer = { x: 0, y: 0 };
   const eyeTarget = { x: 0, y: 0 };
   const eyeLook = { x: 0, y: 0 };
+  const transition = { scan: 0, scanTarget: 0, exit: 0, exitTarget: 0 };
+  const gatherPoint = { x: 1.15, y: 0.8 };
+  let scanTimer = null;
+
+  function startScan() {
+    if (reduceMotion) return;
+    window.clearTimeout(scanTimer);
+    transition.scanTarget = 1;
+    hero?.classList.add('is-scanning');
+    scanTimer = window.setTimeout(() => {
+      transition.scanTarget = 0;
+      hero?.classList.remove('is-scanning');
+    }, 900);
+  }
+
+  scanTrigger?.addEventListener('pointerenter', startScan);
+  scanTrigger?.addEventListener('focus', startScan);
 
   if (!reduceMotion) {
     window.addEventListener('pointermove', (event) => {
@@ -77,6 +97,13 @@ export function initHero3D(canvas) {
       eyeTarget.x = 0;
       eyeTarget.y = 0;
     });
+    const updateExitTarget = () => {
+      const heroHeight = hero?.offsetHeight || window.innerHeight;
+      const progress = window.scrollY / heroHeight;
+      transition.exitTarget = THREE.MathUtils.smoothstep(progress, 0.18, 0.92);
+    };
+    window.addEventListener('scroll', updateExitTarget, { passive: true });
+    updateExitTarget();
   }
 
   function resize() {
@@ -90,7 +117,8 @@ export function initHero3D(canvas) {
     raven.pivot.position.set(wide ? 1.95 : 0, wide ? 0.55 : 1.15, 0);
     raven.pivot.scale.setScalar(wide ? 1 : 0.78);
     environment.moonGroup.position.set(wide ? 2.7 : 0.5, wide ? 1.35 : 2.2, -2.6);
-    moonGlow.position.set(wide ? 2.7 : 0.5, 1.7, -1.2);
+    lights.moonGlow.position.set(wide ? 2.7 : 0.5, 1.7, -1.2);
+    gatherPoint.x = wide ? 1.15 : -0.55;
   }
   window.addEventListener('resize', resize);
   resize();
@@ -133,9 +161,9 @@ export function initHero3D(canvas) {
 
     if (!raven.eyeMesh) return;
     const pulse = 0.5 + 0.5 * Math.sin(time * 2.1);
-    raven.eyeMesh.material.emissiveIntensity = 0.9 + pulse * 0.25;
-    if (raven.eyeGlow) raven.eyeGlow.material.opacity = 0.32 + pulse * 0.2;
-    if (raven.eyeSpark) raven.eyeSpark.material.opacity = 0.5 + pulse * 0.28;
+    raven.eyeMesh.material.emissiveIntensity = 0.9 + pulse * 0.25 + transition.scan * 1.15;
+    if (raven.eyeGlow) raven.eyeGlow.material.opacity = 0.32 + pulse * 0.2 + transition.scan * 0.24;
+    if (raven.eyeSpark) raven.eyeSpark.material.opacity = 0.5 + pulse * 0.28 + transition.scan * 0.18;
     if (raven.pupilMesh && raven.pupilOrigin) {
       raven.pupilMesh.position.x = raven.pupilOrigin.x + eyeLook.x * 0.52;
       raven.pupilMesh.position.y = raven.pupilOrigin.y + eyeLook.y * 0.4;
@@ -158,8 +186,17 @@ export function initHero3D(canvas) {
   function updateEnvironment(time, delta) {
     for (const bank of environment.banks) {
       bank.position.x = bank.userData.baseX
-        + Math.sin(time * 0.07 + bank.userData.phase) * bank.userData.drift;
+        + Math.sin(time * 0.07 + bank.userData.phase)
+          * bank.userData.drift * (1 - transition.exit * 0.7);
     }
+
+    environment.moonGroup.scale.setScalar(1 - transition.exit * 0.08);
+    environment.dustPoints.material.opacity = 0.38 * (1 - transition.exit * 0.75);
+    raven.halo.material.opacity = 1 - transition.exit * 0.35;
+    lights.ambient.intensity = 0.6 - transition.exit * 0.18;
+    lights.key.intensity = 2.3 - transition.exit * 0.7 + transition.scan * 0.22;
+    lights.rim.intensity = 1.7 + transition.scan * 0.5;
+    lights.moonGlow.intensity = 5 - transition.exit * 2.5 + transition.scan * 1.2;
 
     const dustPositions = environment.dustGeometry.attributes.position.array;
     for (let index = 0; index < environment.dustCount; index++) {
@@ -172,16 +209,31 @@ export function initHero3D(canvas) {
       const state = scrap.userData;
       state.y -= state.vy * delta;
       if (state.y < -3.9) state.y = 3.9;
-      scrap.position.y = state.y;
-      scrap.position.x = state.baseX + Math.sin(time * 0.4 + state.phase) * 0.35;
+      const driftingX = state.baseX + Math.sin(time * 0.4 + state.phase) * 0.35;
+      scrap.position.x = THREE.MathUtils.lerp(
+        driftingX,
+        gatherPoint.x + state.gatherX,
+        transition.exit
+      );
+      scrap.position.y = THREE.MathUtils.lerp(
+        state.y,
+        gatherPoint.y + state.gatherY,
+        transition.exit
+      );
       scrap.rotation.z += state.rz * delta;
-      scrap.rotation.x = Math.sin(time * 0.7 + state.phase) * 0.38;
+      scrap.rotation.x = Math.sin(time * 0.7 + state.phase) * 0.38 * (1 - transition.scan * 0.7);
+      scrap.material.opacity = state.baseOpacity
+        * (1 + transition.scan * 0.28)
+        * (1 - transition.exit * 0.88);
+      scrap.scale.setScalar(1 - transition.exit * 0.55);
     }
   }
 
   function frame() {
     const delta = Math.min(clock.getDelta(), 0.05);
     const time = clock.elapsedTime;
+    transition.scan += (transition.scanTarget - transition.scan) * 0.12;
+    transition.exit += (transition.exitTarget - transition.exit) * 0.08;
     updateParallax();
     updateRaven(time, delta);
     updateEnvironment(time, delta);

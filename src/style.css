@@ -80,6 +80,7 @@ code, pre { font-family: var(--mono); }
 .btn:hover { transform: translateY(-2px); }
 .btn--primary { color: #050506; background: var(--ink); border-color: var(--ink); }
 .btn--primary:hover { background: var(--blue); border-color: var(--blue); }
+.hero .btn--primary:hover, .hero.is-scanning .btn--primary { color: var(--ink); background-color: var(--surface); background-image: linear-gradient(105deg, transparent 28%, rgba(120, 169, 255, .28) 48%, transparent 68%); background-size: 220% 100%; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(120, 169, 255, .1), 0 8px 30px rgba(0, 0, 0, .28); animation: hero-scan .9s var(--ease) 1; }
 .btn--ghost { color: var(--ink); background: rgba(5, 5, 6, .7); }
 .btn--ghost:hover { border-color: var(--ink); }
 .hero__stats { display: grid; grid-template-columns: repeat(4, minmax(100px, 1fr)); gap: 0; width: 600px; margin: 36px 0 0; }
@@ -88,12 +89,16 @@ code, pre { font-family: var(--mono); }
 .hero__stats dt { color: var(--ink); font: 600 24px/1.1 var(--mono); }
 .hero__stats dd { margin: 6px 0 0; color: var(--ink-3); font-size: 11px; }
 .hero__signal { position: absolute; z-index: 1; right: -18px; top: 116px; display: flex; flex-direction: column; gap: 10px; }
-.hero__signal span { display: block; width: 34px; height: 110px; }
+.hero__signal span { display: block; width: 34px; height: 110px; transform-origin: top; transition: transform .45s var(--ease), opacity .45s; }
 .hero__signal span:nth-child(1) { background: var(--blue); }
 .hero__signal span:nth-child(2) { background: var(--coral); }
 .hero__signal span:nth-child(3) { height: 66px; background: var(--amber); }
 .hero__scroll { position: absolute; right: 26px; bottom: 24px; z-index: 3; display: flex; align-items: center; gap: 8px; color: var(--ink-3); font: 10px/1 var(--mono); writing-mode: vertical-rl; }
 .hero__scroll span { width: 1px; height: 32px; background: var(--ink-3); }
+.hero.is-scanning .hero__signal span:nth-child(1) { transform: scaleY(.72); }
+.hero.is-scanning .hero__signal span:nth-child(2) { transform: scaleY(.9); }
+.hero.is-scanning .hero__signal span:nth-child(3) { transform: scaleY(.58); }
+@keyframes hero-scan { from { background-position: 130% 0; } to { background-position: -130% 0; } }
 
 /* Shared section structure */
 .marquee { position: relative; z-index: 3; overflow: hidden; padding: 15px 0; border-bottom: 1px solid var(--line); background: var(--ink); color: #050506; }
