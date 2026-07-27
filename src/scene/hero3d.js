@@ -64,9 +64,16 @@ const RAVEN_PLATES = [
   {
     name: 'eye',
     z: 12,
-    color: 0xff2414,
+    color: 0xd90b16,
     eye: true,
-    d: 'M89,20L92,23L92,28L89,31L84,32L80,29L79,27L87,28L89,25L85,24L85,22L87,20Z',
+    d: 'M89,25L88,23L86,22L84,23L83,25L84,27L86,28L88,27Z',
+  },
+  {
+    name: 'pupil',
+    z: 13,
+    color: 0x050505,
+    pupil: true,
+    d: 'M87.5,25L86.75,23.7L85.25,23.7L84.5,25L85.25,26.3L86.75,26.3Z',
   },
 ];
 
@@ -99,12 +106,12 @@ function shapesFromPath(d) {
   return shapes;
 }
 
-function plateGeometry(d, depth) {
+function plateGeometry(d, depth, bevelScale = 1) {
   return new THREE.ExtrudeGeometry(shapesFromPath(d), {
     depth,
     bevelEnabled: true,
-    bevelThickness: 1.1,
-    bevelSize: 0.8,
+    bevelThickness: 1.1 * bevelScale,
+    bevelSize: 0.8 * bevelScale,
     bevelSegments: 1,
     curveSegments: 1,
   });
@@ -274,6 +281,8 @@ export function initHero3D(canvas) {
 
   // ---- the paper-cut raven ------------------------------------------------
   const PLATE_DEPTH = 5; // svg units
+  const EYE_DEPTH = 1.2;
+  const PUPIL_DEPTH = 0.8;
   const RAVEN_SCALE = 0.0195; // 281 svg units -> ~4.6 world units
 
   const ravenPivot = new THREE.Group(); // positioned on resize
@@ -284,18 +293,30 @@ export function initHero3D(canvas) {
   gMid.add(ravenPivot);
 
   let eyeMesh = null;
+  let pupilMesh = null;
   let eyeGlow = null;
   let eyeSpark = null;
   for (const p of RAVEN_PLATES) {
-    const geo = plateGeometry(p.d, PLATE_DEPTH);
+    const eyePart = p.eye || p.pupil;
+    const depth = p.pupil ? PUPIL_DEPTH : (p.eye ? EYE_DEPTH : PLATE_DEPTH);
+    const geo = plateGeometry(p.d, depth, eyePart ? 0.18 : 1);
     let mat;
     if (p.eye) {
       mat = new THREE.MeshStandardMaterial({
-        color: 0xff2414,
-        emissive: 0xff1606,
-        emissiveIntensity: 1.3,
+        color: p.color,
+        emissive: 0xe80012,
+        emissiveIntensity: 1.0,
         roughness: 0.28,
         metalness: 0.0,
+        flatShading: true,
+      });
+    } else if (p.pupil) {
+      mat = new THREE.MeshStandardMaterial({
+        color: 0x050505,
+        emissive: 0x000000,
+        emissiveIntensity: 0,
+        roughness: 1,
+        metalness: 0,
         flatShading: true,
       });
     } else {
@@ -307,34 +328,37 @@ export function initHero3D(canvas) {
       });
     }
     const mesh = new THREE.Mesh(geo, mat);
-    if (p.eye) {
-      // center the eye geometry on itself so blinking scales around its own middle
+    if (eyePart) {
+      // Center both iris and pupil so the blink scales around the same point.
       geo.computeBoundingBox();
       const c = new THREE.Vector3();
       geo.boundingBox.getCenter(c);
       geo.translate(-c.x, -c.y, 0);
       mesh.position.set(c.x, c.y, p.z);
-      eyeMesh = mesh;
-      // crimson iris glow (ring-shaped so the black pupil stays dark) +
-      // a sharp white catch-light — the glossy-starling red eye look.
-      const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: ringGlowTexture('rgba(255,46,22,0.95)', 'rgba(224,14,5,0.7)'),
-        transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-      }));
-      glow.scale.set(26, 26, 1);
-      glow.position.set(0, 0, 2);
-      glow.renderOrder = 2;
-      mesh.add(glow);
-      const spark = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: dotGlowTexture('rgba(255,255,255,0.98)', 'rgba(255,150,120,0.55)'),
-        transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-      }));
-      spark.scale.set(3.4, 3.4, 1);
-      spark.position.set(-1.3, 1.7, 3);
-      spark.renderOrder = 3;
-      mesh.add(spark);
-      eyeGlow = glow;
-      eyeSpark = spark;
+      if (p.pupil) {
+        pupilMesh = mesh;
+      } else {
+        eyeMesh = mesh;
+        // Crimson ring keeps the pupil dark; the tiny white point reads as a wet highlight.
+        const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: ringGlowTexture('rgba(255,10,24,0.9)', 'rgba(205,0,14,0.62)'),
+          transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+        }));
+        glow.scale.set(10, 10, 1);
+        glow.position.set(0, 0, EYE_DEPTH + 0.4);
+        glow.renderOrder = 2;
+        mesh.add(glow);
+        const spark = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: dotGlowTexture('rgba(255,255,255,0.98)', 'rgba(255,150,120,0.55)'),
+          transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+        }));
+        spark.scale.set(1.1, 1.1, 1);
+        spark.position.set(-0.45, 0.55, EYE_DEPTH + 2);
+        spark.renderOrder = 3;
+        mesh.add(spark);
+        eyeGlow = glow;
+        eyeSpark = spark;
+      }
     } else {
       mesh.position.z = p.z;
     }
@@ -524,12 +548,12 @@ export function initHero3D(canvas) {
     ravenIdle.rotation.x = Math.sin(t * 0.33) * 0.035;
     ravenIdle.scale.setScalar(1 - 0.07 * Math.exp(-t * 1.5)); // settle in
 
-    // amber eye: breathe + blink
+    // Crimson eye: a restrained pulse plus a synchronized iris/pupil blink.
     if (eyeMesh) {
       const pulse = 0.5 + 0.5 * Math.sin(t * 2.1); // 0..1 breathing
-      eyeMesh.material.emissiveIntensity = 1.15 + pulse * 0.5;
-      if (eyeGlow) eyeGlow.material.opacity = 0.55 + pulse * 0.35;
-      if (eyeSpark) eyeSpark.material.opacity = 0.55 + pulse * 0.45;
+      eyeMesh.material.emissiveIntensity = 0.9 + pulse * 0.25;
+      if (eyeGlow) eyeGlow.material.opacity = 0.32 + pulse * 0.2;
+      if (eyeSpark) eyeSpark.material.opacity = 0.5 + pulse * 0.28;
       if (t > nextBlink) {
         blinkT = 0;
         nextBlink = t + 4 + Math.random() * 4;
@@ -537,7 +561,9 @@ export function initHero3D(canvas) {
       if (blinkT >= 0) {
         blinkT += dt;
         const p = blinkT / 0.24;
-        eyeMesh.scale.y = p >= 1 ? 1 : Math.max(0.08, Math.abs(Math.cos(p * Math.PI)));
+        const blinkScale = p >= 1 ? 1 : Math.max(0.08, Math.abs(Math.cos(p * Math.PI)));
+        eyeMesh.scale.y = blinkScale;
+        if (pupilMesh) pupilMesh.scale.y = blinkScale;
       }
     }
 
