@@ -181,9 +181,9 @@ function initMockPanel() {
     <div class="rc__toolbar">
       <div class="rc__toolbar-main">
         <input type="search" class="rc__search" placeholder="搜索本类: 算法/路径/明文/Hex…">
-        <button type="button" class="rc__filter-toggle" aria-expanded="true">筛选<span class="rc__chevron">⌃</span></button>
+        <button type="button" class="rc__filter-toggle" aria-expanded="false">筛选<span class="rc__chevron">⌄</span></button>
       </div>
-      <div class="rc__adv-filters">
+      <div class="rc__adv-filters" hidden>
         <span class="rc__filter-field"><label>分类</label><select class="rc__cat-sel"><option value="all">全部</option></select></span>
         <span class="rc__size-filter">
           <label>输入大小</label>
@@ -216,7 +216,7 @@ function initMockPanel() {
 
   let activeTab = PANEL_TABS[0];
   let selectedSeq = null;
-  let filtersOpen = true;
+  let filtersOpen = false;
 
   /* ---- tab bar ---- */
   PANEL_TABS.forEach((tab) => {

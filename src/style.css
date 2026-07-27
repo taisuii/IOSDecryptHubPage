@@ -256,7 +256,7 @@ code, pre { font-family: var(--mono); }
 .rc__detail-actions button:hover { background: #171b22; border-color: #b0b8c4; }
 
 /* List rows */
-.runtime-console .rcrow { width: 100%; padding: 7px 14px; display: block; color: inherit; text-align: left; background: #090b0f; border: 0; border-bottom: 1px solid #171b22; border-left: 2px solid transparent; border-radius: 0; cursor: pointer; transition: background .12s, border-color .12s; }
+.runtime-console .rcrow { width: 100%; padding: 7px 14px; display: block; flex: 0 0 auto; color: inherit; text-align: left; background: #090b0f; border: 0; border-bottom: 1px solid #171b22; border-left: 2px solid transparent; border-radius: 0; cursor: pointer; transition: background .12s, border-color .12s; }
 .runtime-console .rcrow:hover { background: #171b22; }
 .runtime-console .rcrow.selected { background: #171b22; border-left-color: #8ab4ff; }
 .runtime-console .rcrow.cat-digest { border-left-color: #9ee6b6; }
