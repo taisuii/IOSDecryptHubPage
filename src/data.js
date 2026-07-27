@@ -267,21 +267,3 @@ export const MCP_TOOLS = [
   compactTool('get_diag', 'diagnostic', '—', '获取 Hook 健康、持久化和服务事件的审查时间线，以及未成功 Hook 的符号清单。',
     { board: 'crypto' }, { board: 'crypto', diag: '[14:32:17] digest hooks 24/24\n[14:32:17] symmetric hooks 6/6', unhooked: '' }),
 ];
-
-
-
-export const TERM_LINES = [
-  { t: '$ ./scripts/inject.sh Target.ipa decrypt_helper.dylib', c: '' },
-  { t: '  → insert_dylib: LC_LOAD_DYLIB written', c: 'c-mut' },
-  { t: '  ✓ hooked_Target.ipa', c: 'c-ok' },
-  { t: '$ install & launch on device', c: '' },
-  { t: '[IOSDecryptHub] hooks installed: 124/124', c: 'c-ok' },
-  { t: '[IOSDecryptHub] http server on 0.0.0.0:8088', c: 'c-ok' },
-  { t: '', c: '' },
-  { t: '# App calls CCCrypt(...)', c: 'c-mut' },
-  { t: 'AES-256-CBC  key=a3f1…7e0b  iv=0011…eeff', c: 'c-key' },
-  { t: 'plain: {"token":"sk_live_9f2a","uid":42}', c: 'c-ok' },
-  { t: '# App calls SecKeyCreateSignature(...)', c: 'c-mut' },
-  { t: 'RSA-2048  sign  256 B  ✓ captured', c: 'c-key' },
-  { t: 'health: hookFailures=0  sink=ok', c: 'c-warn' },
-];

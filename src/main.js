@@ -2,7 +2,7 @@ import './style.css';
 import { initHero3D } from './scene/hero3d.js';
 import {
   MARQUEE, CAPABILITIES, ALGO_GROUPS, DUMP_STEPS, DUMP_NOTES,
-  MCP_TOOLS, TERM_LINES,
+  MCP_TOOLS,
 } from './data.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -60,36 +60,6 @@ function initCounters() {
   $$('.hero__stats dt').forEach((n) => io.observe(n));
 }
 
-/* ---------------- typing terminal ---------------- */
-function initTerminal() {
-  const body = $('#term-body');
-  if (!body) return;
-  if (reduce) {
-    body.innerHTML = TERM_LINES.map((l) => `<span class="${l.c}">${l.t || ' '}</span>`).join('\n');
-    return;
-  }
-  let li = 0, ci = 0;
-  const cursor = '<span class="term__cursor"></span>';
-  function tick() {
-    if (li >= TERM_LINES.length) {
-      // hold, then restart
-      setTimeout(() => { body.innerHTML = ''; li = 0; ci = 0; tick(); }, 4200);
-      return;
-    }
-    const line = TERM_LINES[li];
-    const done = TERM_LINES.slice(0, li).map((l) => `<span class="${l.c}">${l.t || ' '}</span>`).join('\n');
-    const partial = line.t.slice(0, ci);
-    body.innerHTML = (done ? done + '\n' : '') + `<span class="${line.c}">${partial}</span>` + cursor;
-    ci++;
-    if (ci > line.t.length) {
-      li++; ci = 0;
-      setTimeout(tick, 380);
-    } else {
-      setTimeout(tick, 18 + Math.random() * 26);
-    }
-  }
-  tick();
-}
 
 /* ---------------- marquee ---------------- */
 function initMarquee() {
@@ -545,7 +515,6 @@ function boot() {
   initAlgorithms();
   initDump();
   initMCP();
-  initTerminal();
   initCounters();
   initReveal();
   initHero3D($('#hero-canvas'));
