@@ -1,0 +1,19 @@
+Package: com.iosdecrypthub
+Name: IOSDecryptHub
+Version: 1.23.6
+Architecture: iphoneos-arm64
+Description: iOS runtime security analysis tool (dylib injection via jailbreak)
+Maintainer: IOSDecryptHub
+Author: IOSDecryptHub
+Section: Tweaks
+Depends: ellekit, preferenceloader
+Conflicts: com.iosdecrypthub.trollstore
+Filename: debs/com.iosdecrypthub_1.23.6_rootless.deb
+Size: 399588
+MD5sum: fb70a2643f13e0aa7ba0a049a7b5a8a2
+SHA1: 9aa67471a50bf7a70a59d4f6c38b1723193ac020
+SHA256: 5c20756de02f24ffb60ee6e5180aa01dd8973151e3ebf8a48b6e1d4cdf2c131b
+Depiction: https://ios.decrypthub.com/depictions/com.iosdecrypthub/index.html
+SileoDepiction: https://ios.decrypthub.com/depictions/com.iosdecrypthub/sileo.json
+Icon: https://ios.decrypthub.com/depictions/com.iosdecrypthub/icon.png
+

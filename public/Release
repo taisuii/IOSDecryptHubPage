@@ -1,0 +1,16 @@
+Origin: IOSDecryptHub
+Label: IOSDecryptHub
+Suite: stable
+Version: 1.0
+Codename: ios
+Architectures: iphoneos-arm64
+Components: main
+Description: IOSDecryptHub - iOS Runtime Security Analysis Tool
+MD5Sum:
+ d7c9193fb68e88b2926509ccd6fad621 771 Packages
+ f6da4b14b152c5a43f5d7a90e547cc6d 446 Packages.gz
+ f4cc07ca889ede3415807c566cf89075 500 Packages.bz2
+SHA256:
+ 2126c2b397de9b71534882c9d8d6669d59651766cde64a63b8da127e1cecfdc2 771 Packages
+ 12db7e5672bb3ef85c60cf660ac7da2ea2995c0075e9cefb6820d942fb182422 446 Packages.gz
+ 482f75dccc52751a73a7812641faa6d5ddc2999e7e597d26bf1a24580430941b 500 Packages.bz2

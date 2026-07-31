@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "repo:update": "./scripts/update_repo.sh",
+    "repo:add": "./scripts/update_repo.sh add"
   },
   "dependencies": {
     "three": "^0.169.0"
