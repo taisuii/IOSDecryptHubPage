@@ -1,8 +1,7 @@
 # IOSDecryptHub · 官网
 
-[IOSDecryptHub](https://github.com/taisuii/ios-decrypt-helper) 的官方网站——一个基于 fishhook 的
-iOS App 运行时加解密审计平台。本站为交互式作品级单页，Vite + Three.js 构建，
-通过 GitHub Actions 自动部署到 GitHub Pages。
+IOSDecryptHub 的官方网站——一个基于 fishhook 的
+iOS App 运行时加解密审计平台。本站为交互式作品级单页，Vite + Three.js 构建。
 
 ## 呈现内容
 
