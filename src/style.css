@@ -104,13 +104,45 @@ code, pre { font-family: var(--mono); }
 .marquee__item { display: inline-flex; align-items: center; gap: 40px; white-space: nowrap; font: 600 12px/1 var(--mono); }
 .marquee__item::after { content: '/'; color: #717680; }
 @keyframes slide { to { transform: translateX(-50%); } }
-.section { position: relative; z-index: 2; padding: 104px 0; background: var(--bg); }
+.section { position: relative; z-index: 2; scroll-margin-top: 66px; padding: 104px 0; background: var(--bg); }
 .section--alt { background: #090a0d; border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); }
 .head { display: grid; grid-template-columns: 210px minmax(0, 1fr); column-gap: 40px; max-width: 940px; margin-bottom: 46px; }
 .head__kicker { grid-row: 1 / span 2; padding-top: 10px; color: var(--blue); font: 500 12px/1.4 var(--mono); text-transform: uppercase; }
 .head__kicker::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: currentColor; }
 .head__title { margin: 0 0 14px; color: var(--ink); font-size: 40px; line-height: 1.16; font-weight: 620; }
 .head__lead { margin: 0; color: var(--ink-3); font-size: 15px; line-height: 1.8; }
+.head__lead code { color: var(--ink-2); }
+
+/* Installation: two release channels, one connection path. */
+.section--install { background: #090a0d; border-bottom: 1px solid var(--line-soft); }
+.install-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.install-track { min-width: 0; padding: 30px 36px 32px; }
+.install-track + .install-track { border-left: 1px solid var(--line); }
+.install-track__head { min-height: 154px; }
+.install-track__tag { color: var(--blue); font: 500 10px/1.4 var(--mono); text-transform: uppercase; }
+.install-track--plugin .install-track__tag { color: var(--coral); }
+.install-track h3 { margin: 14px 0 8px; font-size: 24px; line-height: 1.2; }
+.install-track__head p { max-width: 470px; margin: 0; color: var(--ink-3); font-size: 13px; }
+.install-command { min-height: 54px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 0 9px 0 14px; background: #0b0d11; border: 1px solid var(--line); border-radius: var(--radius); }
+.install-command__prompt { color: var(--blue); font: 600 11px/1 var(--mono); text-transform: uppercase; }
+.install-track--plugin .install-command__prompt { color: var(--coral); }
+.install-command code { min-width: 0; overflow-x: auto; color: var(--ink); font: 11px/1.5 var(--mono); white-space: nowrap; }
+.install-copy { min-width: 52px; min-height: 30px; padding: 0 8px; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; font: 10px/1 var(--mono); }
+.install-copy:hover { color: var(--ink); border-color: var(--ink-3); }
+.install-steps { margin: 24px 0 0; padding: 0; list-style: none; counter-reset: install-step; }
+.install-steps li { min-height: 42px; display: grid; grid-template-columns: 24px 116px minmax(0, 1fr); align-items: baseline; gap: 8px; color: var(--ink-3); font-size: 12px; }
+.install-steps li::before { counter-increment: install-step; content: counter(install-step, decimal-leading-zero); color: var(--ink-3); font: 10px/1.5 var(--mono); }
+.install-steps b { color: var(--ink-2); font-size: 12px; }
+.install-steps code { min-width: 0; color: var(--blue); font-size: 11px; word-break: break-all; }
+.install-track--plugin .install-steps code { color: var(--coral); }
+.install-actions { min-height: 44px; margin-top: 18px; display: flex; align-items: center; gap: 14px; }
+.install-actions .btn { flex: 0 0 auto; }
+.install-actions > span { color: var(--ink-3); font-size: 10px; line-height: 1.5; }
+.install-actions code { color: var(--ink-2); }
+.btn--line { min-height: 38px; border-radius: var(--radius); color: var(--ink); background: transparent; }
+.btn--line:hover { border-color: var(--blue); }
+.install-track--plugin .btn--line:hover { border-color: var(--coral); }
+.install-trust { grid-column: 1 / -1; margin: 0; padding: 15px 36px; color: var(--ink-3); background: #0b0d11; border-top: 1px solid var(--line); font-size: 11px; }
 
 /* Capability blocks */
 .caps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
@@ -459,6 +491,9 @@ code, pre { font-family: var(--mono); }
   .head { display: block; }
   .head__kicker { display: block; margin-bottom: 14px; padding: 0; }
   .head__title { font-size: 34px; }
+  .install-grid { grid-template-columns: 1fr; }
+  .install-track + .install-track { border-left: 0; border-top: 1px solid var(--line); }
+  .install-track__head { min-height: 0; margin-bottom: 24px; }
   .mcp, .start, .band { grid-template-columns: 1fr; }
   .mcp__list { border-right: 0; border-bottom: 1px solid var(--line); }
   .rc__toolbar-main { flex-wrap: wrap; }
@@ -499,6 +534,11 @@ code, pre { font-family: var(--mono); }
   .head { margin-bottom: 34px; }
   .head__title { font-size: 29px; }
   .head__lead { font-size: 14px; }
+  .install-track { padding: 26px 18px 28px; }
+  .install-track h3 { font-size: 22px; }
+  .install-steps li { grid-template-columns: 22px 96px minmax(0, 1fr); }
+  .install-actions { align-items: flex-start; flex-direction: column; }
+  .install-trust { padding: 14px 18px; }
   .caps, .algo, .pipe__notes { grid-template-columns: 1fr; }
   .cap { min-height: 300px; }
   .rc__toolbar { padding: 8px 10px; }

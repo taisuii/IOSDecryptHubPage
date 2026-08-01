@@ -41,6 +41,7 @@
         <span class="nav__word">IOSDecrypt<b>Hub</b></span>
       </a>
       <nav class="nav__links" aria-label="主导航">
+        <a href="#install">安装</a>
         <a href="#panel">实时面板</a>
         <a href="#capabilities">能力</a>
         <a href="#algorithms">算法覆盖</a>
@@ -72,10 +73,11 @@
               再用 Web 控制台完成审计、砸壳与 Capstone / MCP 静态分析。
             </p>
             <div class="hero__cta reveal">
-              <a class="btn btn--primary" href="#panel">
-                看它能捕获什么
+              <a class="btn btn--primary" href="#install">
+                开始安装
                 <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M4 10h11m0 0-4-4m4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </a>
+              <a class="btn btn--ghost" href="#panel">查看实时面板</a>
             </div>
             <dl class="hero__stats reveal">
               <div><dt data-count="20" data-suffix="+">0</dt><dd>拦截算法族</dd></div>
@@ -97,11 +99,75 @@
         <div class="marquee__track" id="marquee-track"></div>
       </div>
 
+      <!-- ================= INSTALL ================= -->
+      <section class="section section--install" id="install">
+        <div class="wrap">
+          <header class="head reveal">
+            <span class="head__kicker">01 — 安装与连接</span>
+            <h2 class="head__title">设备装插件，电脑装 idh</h2>
+            <p class="head__lead">
+              越狱设备通过 Sileo / Zebra 安装运行时插件；电脑通过 PyPI 安装命令行工具。
+              两端处于同一可信局域网后，<code>idh</code> 会自动发现已注入的 App。
+            </p>
+          </header>
+
+          <div class="install-grid reveal">
+            <article class="install-track install-track--cli">
+              <div class="install-track__head">
+                <span class="install-track__tag">macOS / Linux · Python 3.10+</span>
+                <h3>安装 idh 命令行</h3>
+                <p>用 pipx 独立安装，获得设备发现、面板打开和 MCP stdio 网关。</p>
+              </div>
+              <div class="install-command">
+                <span class="install-command__prompt">$</span>
+                <code>pipx install ios-decrypt-hub</code>
+                <button type="button" class="install-copy" data-copy="pipx install ios-decrypt-hub">复制</button>
+              </div>
+              <ol class="install-steps">
+                <li><b>确认设备</b><code>idh devices</code></li>
+                <li><b>打开面板</b><code>idh open &lt;target_id&gt;</code></li>
+                <li><b>连接 AI Agent</b><code>idh mcp</code></li>
+              </ol>
+              <div class="install-actions">
+                <a class="btn btn--line" href="https://pypi.org/project/ios-decrypt-hub/" target="_blank" rel="noreferrer">查看 PyPI</a>
+                <span>也可使用 <code>python3 -m pip install ios-decrypt-hub</code></span>
+              </div>
+            </article>
+
+            <article class="install-track install-track--plugin">
+              <div class="install-track__head">
+                <span class="install-track__tag">iOS 14+ · rootless</span>
+                <h3>安装越狱插件</h3>
+                <p>支持 Dopamine、palera1n 等 rootless 环境，依赖由包管理器自动解析。</p>
+              </div>
+              <div class="install-command">
+                <span class="install-command__prompt">源</span>
+                <code>https://ios.decrypthub.com/</code>
+                <button type="button" class="install-copy" data-copy="https://ios.decrypthub.com/">复制</button>
+              </div>
+              <ol class="install-steps">
+                <li><b>添加软件源</b><span>在 Sileo / Zebra 中添加上方地址</span></li>
+                <li><b>安装插件</b><code>com.iosdecrypthub</code></li>
+                <li><b>选择目标 App</b><span>设置 → IOSDecryptHub，启用后重启 App</span></li>
+              </ol>
+              <div class="install-actions">
+                <a class="btn btn--line" href="sileo://source/https://ios.decrypthub.com/">在 Sileo 中添加</a>
+                <span>ElleKit 与 PreferenceLoader 会作为硬依赖安装。</span>
+              </div>
+            </article>
+
+            <p class="install-trust">
+              IOSDecryptHub 的 HTTP / MCP 服务不设认证，仅用于同一可信局域网内的授权安全测试；请勿将 8088 端口暴露到公网。
+            </p>
+          </div>
+        </div>
+      </section>
+
       <!-- ================= INTERACTIVE PANEL ================= -->
       <section class="section section--panel" id="panel">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">01 — 实时面板</span>
+            <span class="head__kicker">02 — 实时面板</span>
             <h2 class="head__title">插件里的运行时控制台，直接在这里操作</h2>
             <p class="head__lead">
               界面与插件内置页面保持一致。切换页签、筛选与搜索测试 IPA 产生的日志，点任意记录查看
@@ -116,7 +182,7 @@
       <section class="section section--alt" id="capabilities">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">02 — 能力全景</span>
+            <span class="head__kicker">03 — 能力全景</span>
             <h2 class="head__title">同一条运行时链路，六种观察视角</h2>
             <p class="head__lead">
               拦截的是 CommonCrypto、Security.framework、OpenSSL EVP 三套系统库，以及沙盒文件与动态库加载；
@@ -131,7 +197,7 @@
       <section class="section section--alt" id="algorithms">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">03 — 算法覆盖</span>
+            <span class="head__kicker">04 — 算法覆盖</span>
             <h2 class="head__title">从 MD5 到 ChaCha20-Poly1305，一次性与流式都收</h2>
             <p class="head__lead">
               摘要、HMAC、对称、非对称、KDF 全线覆盖；流式 Init / Update / Final 会把分片喂入的数据拼回完整明文。
@@ -146,7 +212,7 @@
       <section class="section" id="dump">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">04 — 砸壳 / 脱壳</span>
+            <span class="head__kicker">05 — 砸壳 / 脱壳</span>
             <h2 class="head__title">把内核已解密的内存，写回一份干净镜像</h2>
             <p class="head__lead">
               FairPlay 加密的 __TEXT 在运行时已被内核解密进内存。按需触发——不点按钮就不跑，零额外开销——
@@ -162,7 +228,7 @@
       <section class="section section--alt" id="mcp">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">05 — MCP · 36 tools</span>
+            <span class="head__kicker">06 — MCP · 36 tools</span>
             <h2 class="head__title">从运行时取证到反汇编，全部工具都在这里</h2>
             <p class="head__lead">
               注入的 dylib 内置一个 MCP (Model Context Protocol) 服务器，复用 8088 端口。
@@ -202,6 +268,7 @@
           <p>基于 fishhook 的 iOS App 运行时加解密审计与逆向分析平台。</p>
         </div>
         <div class="foot__links">
+          <a href="#install">安装</a>
           <a href="#capabilities">能力</a>
           <a href="#algorithms">算法覆盖</a>
           <a href="#mcp">MCP 分析</a>

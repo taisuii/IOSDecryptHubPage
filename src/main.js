@@ -69,6 +69,20 @@ function initMarquee() {
   track.innerHTML = one + one; // duplicate for seamless loop
 }
 
+/* ---------------- install ---------------- */
+function initInstall() {
+  $$('.install-copy').forEach((button) => button.addEventListener('click', async () => {
+    const label = button.textContent;
+    try {
+      await navigator.clipboard.writeText(button.dataset.copy);
+      button.textContent = '已复制';
+    } catch {
+      button.textContent = '复制失败';
+    }
+    setTimeout(() => { button.textContent = label; }, 1200);
+  }));
+}
+
 /* ---------------- capabilities ---------------- */
 function initCaps() {
   const grid = $('#caps-grid');
@@ -164,6 +178,7 @@ function initMCP() {
 function boot() {
   initNav();
   initMarquee();
+  initInstall();
   initCaps();
   initMockPanel();
   initAlgorithms();
