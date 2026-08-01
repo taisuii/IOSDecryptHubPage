@@ -267,3 +267,122 @@ export const MCP_TOOLS = [
   compactTool('get_diag', 'diagnostic', '—', '获取 Hook 健康、持久化和服务事件的审查时间线，以及未成功 Hook 的符号清单。',
     { board: 'crypto' }, { board: 'crypto', diag: '[14:32:17] digest hooks 24/24\n[14:32:17] symmetric hooks 6/6', unhooked: '' }),
 ];
+
+// 2026-08-01: CryptoTestHost 经注入后从 8088 接口导出的测试快照。
+// 沙盒绝对路径已归一化，避免把本机容器 UUID 带进官网。
+const TEST_MESSAGE = 'decrypt-helper interactive test sample';
+const TEST_STACK = '0  CryptoTestHost  do_digest + 0xa8\n1  CryptoTestHost  -[TestVC onAll] + 0x38\n2  CryptoTestHost  -[TestVC triggerByKey:] + 0x110';
+const CRYPTO_OUTPUTS = {
+  md5: 'e6ac8d5f32d40c9d693ea7dc038a604e',
+  sha1: '1b74a3e0e615890ccbec4a3d2ebff783bcc2c9b0',
+  sha256: 'c2bef6e7bc6568e6f14fd5280bb58a07f239795153ad682f524f9c006299fe41',
+  sha512: 'c95a62c123444695de1e80959bd29e4eca0dbdb3d773b7bc1cccf7033c0ae06770973df44dbcadba007e009f621a3633c3f7328e394ff3c39920fa4f0fbc42ac',
+  hmac: 'f70b81bedc6961d87de7bb02330da9c72f24a6571dff2eec076526e6199219db',
+};
+
+const cryptoRow = (seq, cat, badge, algo, op, time, inLen, outLen, output, extra = {}) => ({
+  seq, cat, badge, algo, op, time, inLen, outLen,
+  preview: extra.preview || TEST_MESSAGE,
+  input: extra.input || TEST_MESSAGE,
+  output,
+  key: extra.key || '',
+  iv: extra.iv || '',
+  stack: extra.stack || TEST_STACK,
+});
+
+export const PANEL_TABS = [
+  {
+    key: 'crypto', label: '加解密',
+    rows: [
+      cryptoRow(35, 'digest', '摘要', 'SHA256 (streaming)', 'digest', '2026-08-01 15:31:58.185', 73, 32, 'ba50280d1a55cc9fc1ab4512a14a7f4c94d1ca20338da2d291131067cad4eac2', { preview: 'b75ab8db61392af6b38fd78182df2aa6105dfa4fd1d2bcfcdf25c6f8c47ddfcc', input: 'b75ab8db61392af6b38fd78182df2aa6105dfa4fd1d2bcfcdf25c6f8c47ddfccf2ed008acfb8b5a85580b43468bae0f2f541ee5e382ddbffaf12f28d732ede223132372e302e302e31' }),
+      cryptoRow(32, 'digest', '摘要', 'SHA256 (streaming)', 'digest', '2026-08-01 15:31:58.179', 73, 32, 'ba50280d1a55cc9fc1ab4512a14a7f4c94d1ca20338da2d291131067cad4eac2', { preview: 'b75ab8db61392af6b38fd78182df2aa6105dfa4fd1d2bcfcdf25c6f8c47ddfcc', input: 'b75ab8db61392af6b38fd78182df2aa6105dfa4fd1d2bcfcdf25c6f8c47ddfccf2ed008acfb8b5a85580b43468bae0f2f541ee5e382ddbffaf12f28d732ede223132372e302e302e31' }),
+      cryptoRow(31, 'digest', '摘要', 'SHA256 (streaming)', 'digest', '2026-08-01 15:31:58.178', 73, 32, 'ba50280d1a55cc9fc1ab4512a14a7f4c94d1ca20338da2d291131067cad4eac2', { preview: 'b75ab8db61392af6b38fd78182df2aa6105dfa4fd1d2bcfcdf25c6f8c47ddfcc', input: 'b75ab8db61392af6b38fd78182df2aa6105dfa4fd1d2bcfcdf25c6f8c47ddfccf2ed008acfb8b5a85580b43468bae0f2f541ee5e382ddbffaf12f28d732ede223132372e302e302e31' }),
+      cryptoRow(29, 'digest', '摘要', 'SHA256', 'digest', '2026-08-01 15:31:58.167', 45, 32, '7858c5559b87afc2...', { preview: '{"probe":"network-capture","secret":"s3cr3t"}', input: '{"probe":"network-capture","secret":"s3cr3t"}' }),
+      cryptoRow(28, 'symm', '对称', 'AES-128-CBC-PKCS7', 'encrypt', '2026-08-01 15:31:58.079', 38, 48, '9954f29e1585643e671b529426328fee8c585a8627bef8e8fb88df1569fe8990ac17f68f244e5e3280bd4a56ec48df0f', { key: '000102030405060708090a0b0c0d0e0f', iv: '101112131415161718191a1b1c1d1e1f' }),
+      cryptoRow(26, 'digest', '摘要', 'MD5', 'digest', '2026-08-01 15:31:58.071', 38, 16, CRYPTO_OUTPUTS.md5),
+      cryptoRow(12, 'asym', '非对称', 'ENC-algid:encrypt:RSA:OAEP:SHA256', 'encrypt', '2026-08-01 15:31:55.470', 38, 256, '9cb68aaa86eb3d6573cbbe2f8ad35e7390460006215f045602ed2b22bafabeb39324a9c431f9cc87f189fd4187efdc8b0f3733274d0c1e3c39d1688b2f492a8f179ae2f8128f05e515bf138964c6815fc18bf89426742cb646b355d3e6d4ac2297c74ab4de3048d07aeaec0720fbe2d9d966067687196059f1539acbfff7e910b83fd4d1e5c93fefe7ed8a70276bc47250b0f67de7e5990f1ff07c770cfa45386d106e9879e7466fa4e3da70d982dc7599e1982f169c90a1a252f0d2ffed443e7d72497126be8b737a0383be9a40672f15cd443e0b025abba39f59985ef2db9d853ce2f570d10d4331c275f81157a4ee402d8e9a3bf0669cc3a3688c0d3669c4'),
+      cryptoRow(11, 'asym', '非对称', 'SIGN-algid:sign:RSA:message-PKCS1v15:SHA256', 'sign', '2026-08-01 15:31:55.469', 38, 256, '63a2390717c2699dcc8bb462deefe272f031c472fb89d792910ba0ed93a57ab2db37c9e8f600573dc52883ef297a8cda994ffd9e5dac6e29cb43c2c383160e63a5a8f4b3992611684c4ee065496a7fe853628c621f1423a06d857e00a113ec3158818475b5c61efb62a8fb82c7d35c9918d6c59f421a0abb7573e71c71610beacf9fd3f5282886121dcb0020d881f73257cae65b1d2e9f83c8f4a3a9f48d13245a195a086bd6cb0d248a2c35c4815e79669e703f9f0726c07d9b049cfd59c14fa7619b65cf0ff303df66d3d9781ab7289ff46ce8c5109cfee82995803847b47bceb9c97c91ceb9b870204666c79d1cab1120a26d5a4a994a59e5fca47221f920'),
+      cryptoRow(9, 'symm', '对称', 'RC4-CBC-NoPad', 'encrypt', '2026-08-01 15:31:55.406', 38, 38, '8df9238b3e926de16ebefbb66baf0a26bd05e42d93d43687f9fb85ad9c449722285b266f5c66', { key: '000102030405060708090a0b0c0d0e0f' }),
+      cryptoRow(8, 'symm', '对称', 'DES-CBC-PKCS7', 'encrypt', '2026-08-01 15:31:55.401', 38, 40, '8f71b2e5a3f77b8504f1c2603b45bba182f24801392a2a72ceb7f51a9c3aefd8855ae219da037d47', { key: '0001020304050607', iv: '1011121314151617' }),
+      cryptoRow(7, 'symm', '对称', '3DES-CBC-PKCS7', 'encrypt', '2026-08-01 15:31:55.397', 38, 40, 'cd657a7d58d639543c646302c44bcd1d0220f70f5741622b5fd28e7249580ac2f23825fa7dde155f', { key: '000102030405060708090a0b0c0d0e0f1011121314151617', iv: '1011121314151617' }),
+      cryptoRow(6, 'symm', '对称', 'AES-128-CBC-PKCS7', 'encrypt', '2026-08-01 15:31:55.393', 38, 48, 'b9ac6f5d89bd9b5170e473aa26bfe6b04fc0367ce7bdb9adf85cfc2cd9dd4c4aabad6107cb548701e88385476bc48837', { key: '000102030405060708090a0b0c0d0e0f', iv: '101112131415161718191a1b1c1d1e1f', stack: '0  CryptoTestHost  do_sym + 0x164\n1  CryptoTestHost  -[TestVC onAll] + 0x54\n2  CryptoTestHost  -[TestVC triggerByKey:] + 0x110' }),
+      cryptoRow(5, 'hmac', 'HMAC', 'HMAC-SHA256', 'digest', '2026-08-01 15:31:55.389', 38, 32, CRYPTO_OUTPUTS.hmac, { key: '7365637265742d6b6579', stack: '0  CryptoTestHost  do_hmac + 0x74\n1  CryptoTestHost  -[TestVC onAll] + 0x44\n2  CryptoTestHost  -[TestVC triggerByKey:] + 0x110' }),
+      cryptoRow(4, 'digest', '摘要', 'SHA512', 'digest', '2026-08-01 15:31:55.386', 38, 64, CRYPTO_OUTPUTS.sha512),
+      cryptoRow(3, 'digest', '摘要', 'SHA256', 'digest', '2026-08-01 15:31:55.382', 38, 32, CRYPTO_OUTPUTS.sha256),
+      cryptoRow(2, 'digest', '摘要', 'SHA1', 'digest', '2026-08-01 15:31:55.378', 38, 20, CRYPTO_OUTPUTS.sha1),
+      cryptoRow(1, 'digest', '摘要', 'MD5', 'digest', '2026-08-01 15:31:55.374', 38, 16, CRYPTO_OUTPUTS.md5),
+    ],
+  },
+  {
+    key: 'sys', label: '系统',
+    rows: [
+      { seq: 37, cat: 'sys', badge: '系统', algo: 'sysctl', op: 'mib=4.17', time: '2026-08-01 15:31:58.188', inLen: 0, outLen: 0, preview: '', input: '', output: '', stack: '0  CryptoTestHost  triggerScenarioById: + 0x238' },
+      { seq: 36, cat: 'sys', badge: '系统', algo: 'sysctl', op: 'mib=4.17', time: '2026-08-01 15:31:58.187', inLen: 0, outLen: 0, preview: '', input: '', output: '', stack: '0  CryptoTestHost  triggerScenarioById: + 0x238' },
+      { seq: 34, cat: 'sys', badge: '系统', algo: 'sysctl', op: 'mib=4.17', time: '2026-08-01 15:31:58.183', inLen: 0, outLen: 0, preview: '', input: '', output: '', stack: '0  CryptoTestHost  triggerScenarioById: + 0x238' },
+      { seq: 33, cat: 'sys', badge: '系统', algo: 'sysctl', op: 'mib=4.17', time: '2026-08-01 15:31:58.181', inLen: 0, outLen: 0, preview: '', input: '', output: '', stack: '0  CryptoTestHost  triggerScenarioById: + 0x238' },
+      { seq: 30, cat: 'sys', badge: '系统', algo: 'dlsym', op: 'resolved', time: '2026-08-01 15:31:58.170', inLen: 0, outLen: 0, preview: 'RTLD_DEFAULT | dh_http_url', input: 'RTLD_DEFAULT | dh_http_url', output: 'resolved', stack: '0  CryptoTestHost  do_network + 0x2dc' },
+      { seq: 27, cat: 'sys', badge: '系统', algo: 'dlsym', op: 'redirect', time: '2026-08-01 15:31:58.075', inLen: 0, outLen: 0, preview: 'RTLD_DEFAULT | CCCrypt -> hook', input: 'RTLD_DEFAULT | CCCrypt', output: 'hooked_CCCrypt', stack: '0  CryptoTestHost  do_dlsym + 0x88' },
+      { seq: 25, cat: 'sys', badge: '系统', algo: 'dlsym', op: 'redirect', time: '2026-08-01 15:31:58.067', inLen: 0, outLen: 0, preview: 'RTLD_DEFAULT | CC_MD5 -> hook', input: 'RTLD_DEFAULT | CC_MD5', output: 'hooked_CC_MD5', stack: '0  CryptoTestHost  do_dlsym + 0x30' },
+      { seq: 24, cat: 'sys', badge: '系统', algo: 'dlopen', op: 'loaded', time: '2026-08-01 15:31:57.959', inLen: 0, outLen: 0, preview: '/usr/lib/libz.dylib', input: '/usr/lib/libz.dylib', output: '', stack: '0  CryptoTestHost  do_dlopen + 0x34' },
+      { seq: 23, cat: 'sys', badge: '系统', algo: 'dlopen', op: 'loaded', time: '2026-08-01 15:31:57.951', inLen: 0, outLen: 0, preview: '/usr/lib/libsqlite3.dylib', input: '/usr/lib/libsqlite3.dylib', output: '', stack: '0  CryptoTestHost  do_dlopen + 0x1c' },
+      { seq: 22, cat: 'file', badge: '文件', algo: 'write', op: '56 bytes', time: '2026-08-01 15:31:57.847', inLen: 0, outLen: 0, preview: 'Documents/iosdh_test.txt', input: 'Documents/iosdh_test.txt', output: '', stack: '0  CryptoTestHost  do_file_write + 0x88' },
+      { seq: 21, cat: 'file', badge: '文件', algo: 'open', op: '写|创建|截断', time: '2026-08-01 15:31:57.843', inLen: 0, outLen: 0, preview: 'Documents/iosdh_test.txt', input: 'Documents/iosdh_test.txt', output: '', stack: '0  CryptoTestHost  do_file_write + 0x50' },
+      { seq: 20, cat: 'file', badge: '文件', algo: 'rename', op: 'iosdh_test.txt -> iosdh_test.txt.bak', time: '2026-08-01 15:31:57.752', inLen: 0, outLen: 0, preview: 'Documents/iosdh_test.txt.bak', input: 'Documents/iosdh_test.txt', output: 'Documents/iosdh_test.txt.bak', stack: '0  CryptoTestHost  do_file_rename + 0xa8' },
+      { seq: 19, cat: 'file', badge: '文件', algo: 'rename', op: '.dat.nosync -> iosdh_test.txt', time: '2026-08-01 15:31:57.746', inLen: 0, outLen: 0, preview: 'Documents/iosdh_test.txt', input: 'Documents/.dat.nosync', output: 'Documents/iosdh_test.txt', stack: '0  Foundation  writeToFile:atomically: + 0x0' },
+      { seq: 18, cat: 'file', badge: '文件', algo: 'write', op: '11 bytes', time: '2026-08-01 15:31:57.742', inLen: 0, outLen: 0, preview: 'Documents/.dat.nosync', input: 'Documents/.dat.nosync', output: '', stack: '0  Foundation  writeToFile:atomically: + 0x0' },
+      { seq: 17, cat: 'file', badge: '文件', algo: 'open', op: '读写|创建', time: '2026-08-01 15:31:57.735', inLen: 0, outLen: 0, preview: 'Documents/.dat.nosync', input: 'Documents/.dat.nosync', output: '', stack: '0  Foundation  writeToFile:atomically: + 0x0' },
+      { seq: 16, cat: 'file', badge: '文件', algo: 'read', op: '56 bytes', time: '2026-08-01 15:31:57.632', inLen: 56, outLen: 0, preview: 'IOSDecryptHub file hook test - 文件操作测试数据', input: 'IOSDecryptHub file hook test - 文件操作测试数据\n', output: '', stack: '0  CryptoTestHost  do_file_read + 0x70\n1  CryptoTestHost  -[TestVC onFRead] + 0x18' },
+      { seq: 15, cat: 'file', badge: '文件', algo: 'open', op: '读', time: '2026-08-01 15:31:57.628', inLen: 0, outLen: 0, preview: 'Documents/iosdh_test.txt', input: 'Documents/iosdh_test.txt', output: '', stack: '0  CryptoTestHost  do_file_read + 0x38' },
+      { seq: 14, cat: 'file', badge: '文件', algo: 'write', op: '56 bytes', time: '2026-08-01 15:31:57.519', inLen: 0, outLen: 0, preview: 'Documents/iosdh_test.txt', input: 'Documents/iosdh_test.txt', output: '', stack: '0  CryptoTestHost  do_file_write + 0x88' },
+      { seq: 13, cat: 'file', badge: '文件', algo: 'open', op: '写|创建|截断', time: '2026-08-01 15:31:57.515', inLen: 0, outLen: 0, preview: 'Documents/iosdh_test.txt', input: 'Documents/iosdh_test.txt', output: '', stack: '0  CryptoTestHost  do_file_write + 0x50' },
+    ],
+  },
+  {
+    key: 'net', label: '网络',
+    rows: [{ seq: 38, cat: 'net', badge: '网络', algo: 'HTTP', op: 'POST', time: '2026-08-01 15:31:58.190', inLen: 45, outLen: 9, preview: '{"probe":"network-capture","secret":"s3cr3t"}', input: '{"probe":"network-capture","secret":"s3cr3t"}', output: 'not found', stack: '0  CryptoTestHost  do_network + 0x2dc\n1  CryptoTestHost  triggerScenarioById: + 0x238' }],
+  },
+  {
+    key: 'keychain', label: 'Keychain',
+    rows: [
+      { seq: 139, cat: 'keychain', badge: 'Keychain', algo: 'SecItemDelete', op: 'status=0', time: '2026-07-24 12:00:06.176', inLen: 0, outLen: 0, preview: 'service=com.dh.probe.service · account=probe-account', input: 'service=com.dh.probe.service · account=probe-account', output: 'errSecSuccess', stack: '0  exercise_runner  test_keychain + 0x230' },
+      { seq: 138, cat: 'keychain', badge: 'Keychain', algo: 'SecItemUpdate', op: 'status=0', time: '2026-07-24 12:00:06.171', inLen: 17, outLen: 0, preview: 'kc-secret-ROTATED', input: 'kc-secret-ROTATED', output: 'errSecSuccess', stack: '0  exercise_runner  test_keychain + 0x1d4' },
+      { seq: 137, cat: 'keychain', badge: 'Keychain', algo: 'SecItemCopyMatching', op: 'status=0', time: '2026-07-24 12:00:06.166', inLen: 0, outLen: 22, preview: 'kc-secret-token-9f8e7d', input: 'service=com.dh.probe.service · account=probe-account', output: 'kc-secret-token-9f8e7d', stack: '0  exercise_runner  test_keychain + 0x154' },
+      { seq: 136, cat: 'keychain', badge: 'Keychain', algo: 'SecItemAdd', op: 'status=0', time: '2026-07-24 12:00:06.160', inLen: 22, outLen: 0, preview: 'kc-secret-token-9f8e7d', input: 'kc-secret-token-9f8e7d', output: 'errSecSuccess', stack: '0  exercise_runner  test_keychain + 0xd0' },
+      { seq: 135, cat: 'keychain', badge: 'Keychain', algo: 'SecItemDelete', op: 'status=-25300', time: '2026-07-24 12:00:06.154', inLen: 0, outLen: 0, preview: '清理测试条目', input: 'service=com.dh.probe.service · account=probe-account', output: 'errSecItemNotFound', stack: '0  exercise_runner  test_keychain + 0x70' },
+    ],
+  },
+  { key: 'files', label: '文件', kind: 'files' },
+  { key: 'symbols', label: '符号', kind: 'symbols' },
+  { key: 'dump', label: 'Dump', kind: 'dump' },
+];
+
+export const PANEL_FILES = [
+  { path: 'Documents', name: 'Documents', type: 'dir', depth: 0 },
+  { path: 'Documents/iosdh_test.txt', name: 'iosdh_test.txt', type: 'file', depth: 1, size: 56, content: 'IOSDecryptHub file hook test - 文件操作测试数据\n' },
+  { path: 'Documents/iosdh_test.txt.bak', name: 'iosdh_test.txt.bak', type: 'file', depth: 1, size: 11, content: 'rename test' },
+  { path: 'Documents/decrypt_helper.log', name: 'decrypt_helper.log', type: 'file', depth: 1, size: 99339, content: '[15:31:55.374] #1 digest MD5 in=38 out=16\n[15:31:55.393] #6 sym AES-128-CBC-PKCS7 in=38 out=48\n[15:31:57.632] #16 file read 56 bytes\n[15:31:58.190] #38 net HTTP POST' },
+  { path: 'Library', name: 'Library', type: 'dir', depth: 0 },
+  { path: 'Library/Caches', name: 'Caches', type: 'dir', depth: 1 },
+  { path: 'Library/HTTPStorages', name: 'HTTPStorages', type: 'dir', depth: 1 },
+  { path: 'Library/Preferences', name: 'Preferences', type: 'dir', depth: 1 },
+  { path: 'Library/Saved Application State', name: 'Saved Application State', type: 'dir', depth: 1 },
+  { path: 'tmp', name: 'tmp', type: 'dir', depth: 0 },
+];
+
+export const PANEL_SYMBOL_IMAGES = [
+  { idx: 0, name: 'CryptoTestHost', imports: 119, kind: '主程序' },
+  { idx: 3, name: 'Security', imports: 1205, kind: 'Framework' },
+  { idx: 2, name: 'Foundation', imports: 4303, kind: 'Framework' },
+  { idx: 6, name: 'libSystem.B.dylib', imports: 76, kind: 'dylib' },
+];
+
+export const PANEL_SYMBOLS = {
+  0: ['CCCrypt', 'CCHmac', 'CCKeyDerivationPBKDF', 'CC_MD5', 'CC_SHA1', 'CC_SHA256', 'CC_SHA512', 'CFDataCreate', 'CFRelease', 'NSLog', 'NSSearchPathForDirectoriesInDomains', 'NSSelectorFromString', 'NSStringFromClass', 'OBJC_CLASS_$_ASIdentifierManager', 'OBJC_CLASS_$_NSArray', 'OBJC_CLASS_$_NSData', 'OBJC_CLASS_$_NSDictionary', 'OBJC_CLASS_$_NSMutableDictionary', 'OBJC_CLASS_$_NSMutableURLRequest', 'SecKeyCopyPublicKey', 'SecKeyCreateEncryptedData', 'SecKeyCreateRandomKey', 'SecKeyCreateSignature', 'dlclose', 'dlopen', 'dlsym', 'open', 'read', 'write'],
+  3: ['AnalyticsSendEvent', 'AnalyticsSendEventLazy', 'CCCrypt', 'CCCryptorCreate', 'CCCryptorFinal', 'CCCryptorGetOutputLength', 'CCCryptorRelease', 'CCCryptorUpdate', 'CCDigest', 'CCDigestCreate', 'CCDigestDestroy', 'CCDigestFinal'],
+  2: ['$s10ObjectiveC8ObjCBoolVMn', '$s10ObjectiveC8SelectorVMn', '$s10ObjectiveC8SelectorVyACSScfC', '$s11RawExponentSBTl', '$s11RegexOutput17_StringProcessing0A9ComponentPTl', '$s11SubSequenceSlTl', '$s12CoreGraphics7CGFloatVMn', '$s12CoreGraphics7CGFloatVN', '$s12CoreGraphics7CGFloatVSEAAMc', '$s12CoreGraphics7CGFloatVSQAAMc', '$s12CoreGraphics7CGFloatVSeAAMc', '$s12CoreGraphics7CGFloatVs7CVarArgAAMc', '$s13AsyncIteratorSciTl', '$s14CoreFoundation9_CFObjectMp', '$s14CoreFoundation9_CFObjectPAAE2eeoiySbx_xtFZ', '$s14CoreFoundation9_CFObjectPAAE4hash4intoys6HasherVz_tF', '$s14CoreFoundation9_CFObjectPAAE9hashValueSivg', '$s14CoreFoundation9_CFObjectPSHTb', '$s14RawSignificandSBTl', '$s15RuntimeInternal12TypeMetadataV8_resolveyAA0D0VSgAA07MangledC9ReferenceVF'],
+  6: ['__error', '__init_libsystem_sim_kernel', '__init_libsystem_sim_platform', '__init_libsystem_sim_pthread', '__libdarwin_init', '__libkernel_init', '__libplatform_init', '__malloc_init', '__malloc_late_init', '__pthread_init', '__pthread_late_init', '_asl_fork_child', '_container_init', '_dirhelper', '_dyld_atfork_parent', '_dyld_atfork_prepare', '_dyld_dlopen_atfork_child', '_dyld_dlopen_atfork_parent', '_dyld_dlopen_atfork_prepare', '_dyld_fork_child'],
+};
+
+export const PANEL_DUMP_IMAGES = [
+  { name: 'CryptoTestHost', kind: '主程序', size: 139232, cryptid: 0, encrypted: false },
+];

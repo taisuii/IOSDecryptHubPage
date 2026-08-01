@@ -167,6 +167,7 @@ code, pre { font-family: var(--mono); }
 .runtime-console button { min-height: 32px; padding: 0 10px; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
 .runtime-console button:hover { background: #171b22; border-color: #b0b8c4; }
 .runtime-console input:focus, .runtime-console select:focus { outline: 2px solid rgba(120,169,255,.25); outline-offset: 0; border-color: var(--blue); }
+.runtime-console [hidden] { display: none !important; }
 
 /* Tab bar */
 .rc__tabs { min-height: 48px; padding: 0 12px; display: flex; gap: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; background: #0b0d12; border-bottom: 1px solid #414a59; }
@@ -291,6 +292,50 @@ code, pre { font-family: var(--mono); }
 /* Empty state */
 .rc__empty { padding: 54px 20px; color: #b0b8c4; text-align: center; line-height: 1.8; }
 .rc__empty b { color: #f7f8fb; }
+
+/* Files: sandbox tree + content preview. */
+.rc__special-pane { height: 540px; background: #0b0d12; }
+.rc__files-workspace, .rc__symbols-workspace { height: 100%; display: flex; min-width: 0; }
+.rc__tree-pane, .rc__image-pane { width: 42%; min-width: 220px; display: flex; flex-direction: column; background: #090b0f; }
+.rc__files-head, .rc__images-head { min-height: 50px; padding: 0 14px; display: flex; align-items: center; color: #b0b8c4; background: #171b22; border-bottom: 1px solid #414a59; font-size: 11px; text-transform: uppercase; }
+.rc__file-tree, .rc__image-list { flex: 1; overflow-y: auto; }
+.runtime-console .rc__file-row, .runtime-console .rc__image-row { width: 100%; min-height: 0; display: flex; color: #f7f8fb; background: #090b0f; border: 0; border-bottom: 1px solid #171b22; border-left: 2px solid transparent; border-radius: 0; text-align: left; }
+.runtime-console .rc__file-row { height: 42px; padding: 0 12px 0 calc(14px + var(--depth) * 18px); align-items: center; gap: 9px; }
+.runtime-console .rc__file-row:hover, .runtime-console .rc__image-row:hover { background: #171b22; }
+.runtime-console .rc__file-row.selected, .runtime-console .rc__image-row.selected { background: #171b22; border-left-color: #8ab4ff; }
+.rc__file-icon { width: 28px; flex: 0 0 28px; color: #b0b8c4; font: 10px/1 var(--mono); }
+.rc__file-icon.dir { color: #f7f8fb; font-weight: 700; }
+.rc__file-row .name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 12px/1.4 var(--mono); }
+.rc__file-row .size { margin-left: auto; color: #b0b8c4; font: 10px/1 var(--mono); white-space: nowrap; }
+.rc__file-preview, .rc__symbol-detail { flex: 1; min-width: 0; overflow-y: auto; padding: 0 18px 24px; }
+.rc__files-preview-head, .rc__symbol-controls { position: sticky; top: 0; z-index: 1; min-height: 50px; display: flex; align-items: center; gap: 10px; background: #0b0d12; border-bottom: 1px solid #414a59; }
+.rc__files-preview-head .path { min-width: 0; flex: 1; color: #f7f8fb; font: 12px/1.5 var(--mono); word-break: break-all; }
+.rc__files-preview-head .meta { color: #b0b8c4; font: 11px/1 var(--mono); white-space: nowrap; }
+.rc__files-preview-body { margin: 14px 0 0; color: #f7f8fb; font: 11px/1.65 var(--mono); white-space: pre-wrap; word-break: break-all; }
+
+/* Symbols: loaded image list + imported symbol table. */
+.runtime-console .rc__image-row { padding: 10px 14px; flex-direction: column; align-items: stretch; gap: 3px; }
+.rc__image-row .top { display: flex; align-items: center; gap: 10px; }
+.rc__image-row strong { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 12px/1.4 var(--mono); }
+.rc__image-row .top span, .rc__image-row small { color: #b0b8c4; font-size: 10px; }
+.rc__symbol-controls { padding: 9px 0; }
+.rc__symbol-controls input { width: min(320px, 70%); min-height: 32px; padding: 0 9px; }
+.rc__symbol-controls span { margin-left: auto; color: #b0b8c4; font: 11px/1 var(--mono); }
+.rc__table { width: 100%; border-collapse: collapse; color: #f7f8fb; font-size: 12px; }
+.rc__table th, .rc__table td { padding: 9px 10px; border-bottom: 1px solid #414a59; text-align: left; }
+.rc__table th { position: sticky; top: 50px; z-index: 1; color: #b0b8c4; background: #171b22; font-weight: 600; }
+.rc__table th:first-child, .rc__table td:first-child { width: 52px; color: #b0b8c4; }
+.rc__table td.symbol { color: #f7f8fb; font-family: var(--mono); word-break: break-all; }
+
+/* Dump: the plugin's full-width image table. */
+.rc__dump-pane { height: 100%; overflow-y: auto; padding: 24px; background: #0c0e13; }
+.rc__dump-wrap { width: 100%; }
+.rc__dump-wrap h2 { margin: 0 0 7px; color: #f7f8fb; font-size: 18px; }
+.rc__dump-wrap p { margin: 0 0 18px; color: #b0b8c4; font-size: 12px; }
+.rc__dump-table { margin-top: 6px; }
+.rc__dump-table th { top: 0; }
+.rc__dump-table th:first-child, .rc__dump-table td:first-child { width: auto; color: inherit; }
+.rc__table-action { color: #8ab4ff; white-space: nowrap; }
 
 
 /* Algorithms and dump */
@@ -422,6 +467,12 @@ code, pre { font-family: var(--mono); }
   .rc__list { width: auto !important; height: 320px; border-bottom: 1px solid #414a59; }
   .rc__splitter { display: none; }
   .rc__detail { min-height: 300px; }
+  .rc__special-pane { height: auto; }
+  .rc__files-workspace, .rc__symbols-workspace { height: 720px; min-height: 0; flex-direction: column; }
+  .rc__tree-pane, .rc__image-pane { width: 100%; min-width: 0; height: 300px; flex: 0 0 300px; border-bottom: 1px solid #414a59; }
+  .rc__file-preview, .rc__symbol-detail { height: 420px; min-height: 0; flex: 0 0 420px; }
+  .rc__dump-pane { min-height: 420px; overflow-x: auto; }
+  .rc__dump-table { min-width: 680px; }
   .mcp__list { max-height: 240px; }
   .mcp__io { grid-template-columns: 1fr; }
   .mcp__col + .mcp__col { border-left: 0; border-top: 1px solid var(--line); }
@@ -458,6 +509,11 @@ code, pre { font-family: var(--mono); }
   .rc__list { height: 310px; }
   .rc__splitter { display: none; }
   .rc__detail { flex: 1; padding: 0 14px 24px; }
+  .rc__files-workspace, .rc__symbols-workspace { height: 700px; }
+  .rc__tree-pane, .rc__image-pane { height: 320px; flex-basis: 320px; }
+  .rc__file-preview, .rc__symbol-detail { height: 380px; flex-basis: 380px; }
+  .rc__file-preview, .rc__symbol-detail { padding: 0 14px 20px; }
+  .rc__dump-pane { padding: 18px 14px; }
   .rcrow__top > span:not(.rcrow__pill):not(.rcrow__seq) { display: none; }
   .rcrow__top time { display: none; }
   .pipe { grid-template-columns: 1fr; }

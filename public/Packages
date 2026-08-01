@@ -9,10 +9,10 @@ Section: Tweaks
 Depends: ellekit, preferenceloader
 Conflicts: com.iosdecrypthub.trollstore
 Filename: debs/com.iosdecrypthub_1.23.6_rootless.deb
-Size: 399588
-MD5sum: fb70a2643f13e0aa7ba0a049a7b5a8a2
-SHA1: 9aa67471a50bf7a70a59d4f6c38b1723193ac020
-SHA256: 5c20756de02f24ffb60ee6e5180aa01dd8973151e3ebf8a48b6e1d4cdf2c131b
+Size: 399684
+MD5sum: a6ce49488aa9aa2e5c264c527b066328
+SHA1: 76475f6594fc4a684bdf3ffa2259e0012e0eccf3
+SHA256: 8b65b9271661e8243b56b7b6bea3637420d903803943c8e0c8bfe329e67ba37b
 Depiction: https://ios.decrypthub.com/depictions/com.iosdecrypthub/index.html
 SileoDepiction: https://ios.decrypthub.com/depictions/com.iosdecrypthub/sileo.json
 Icon: https://ios.decrypthub.com/depictions/com.iosdecrypthub/icon.png
