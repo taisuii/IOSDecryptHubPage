@@ -2,7 +2,7 @@ import './style.css';
 import { initHero3D } from './scene/hero3d.js';
 import { initMockPanel } from './panel.js';
 import {
-  MARQUEE, CAPABILITIES, ALGO_GROUPS, DUMP_STEPS, DUMP_NOTES,
+  CAPABILITIES, ALGO_GROUPS, DUMP_STEPS, DUMP_NOTES,
   MCP_TOOLS,
 } from './data.js';
 
@@ -14,8 +14,6 @@ const el = (tag, cls, html) => {
   if (html != null) n.innerHTML = html;
   return n;
 };
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 /* ---------------- nav ---------------- */
 function initNav() {
   const nav = $('#nav');
@@ -36,50 +34,44 @@ function initReveal() {
   $$('.reveal').forEach((n) => io.observe(n));
 }
 
-/* ---------------- animated counters ---------------- */
-function initCounters() {
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (!e.isIntersecting) return;
-      io.unobserve(e.target);
-      const node = e.target;
-      const end = +node.dataset.count;
-      const suffix = node.dataset.suffix || '';
-      const text = node.dataset.text;
-      if (text) { node.textContent = text; return; }
-      if (reduce) { node.textContent = end + suffix; return; }
-      const dur = 1200; const t0 = performance.now();
-      const step = (now) => {
-        const p = Math.max(0, Math.min((now - t0) / dur, 1));
-        const eased = 1 - Math.pow(1 - p, 3);
-        node.textContent = Math.round(end * eased) + suffix;
-        if (p < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
-  }, { threshold: 0.5 });
-  $$('.hero__stats dt').forEach((n) => io.observe(n));
-}
-
-
-/* ---------------- marquee ---------------- */
-function initMarquee() {
-  const track = $('#marquee-track');
-  const one = MARQUEE.map((m) => `<span class="marquee__item">${m}</span>`).join('');
-  track.innerHTML = one + one; // duplicate for seamless loop
-}
-
 /* ---------------- install ---------------- */
+async function copyText(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const input = el('textarea');
+  input.value = text;
+  input.setAttribute('readonly', '');
+  input.style.position = 'fixed';
+  input.style.opacity = '0';
+  document.body.appendChild(input);
+  input.select();
+  const copied = document.execCommand('copy');
+  input.remove();
+  if (!copied) throw new Error('copy failed');
+}
+
 function initInstall() {
   $$('.install-copy').forEach((button) => button.addEventListener('click', async () => {
-    const label = button.textContent;
+    const originalLabel = button.getAttribute('aria-label');
+    const status = $('.sr-only', button);
     try {
-      await navigator.clipboard.writeText(button.dataset.copy);
-      button.textContent = '已复制';
+      await copyText(button.dataset.copy);
+      button.classList.add('copied');
+      button.setAttribute('aria-label', '已复制');
+      status.textContent = '已复制';
     } catch {
-      button.textContent = '复制失败';
+      button.classList.add('copy-failed');
+      button.setAttribute('aria-label', '复制失败');
+      status.textContent = '复制失败';
     }
-    setTimeout(() => { button.textContent = label; }, 1200);
+    setTimeout(() => {
+      button.classList.remove('copied', 'copy-failed');
+      button.setAttribute('aria-label', originalLabel);
+      status.textContent = '';
+    }, 1400);
   }));
 }
 
@@ -177,14 +169,12 @@ function initMCP() {
 /* ---------------- boot ---------------- */
 function boot() {
   initNav();
-  initMarquee();
   initInstall();
   initCaps();
   initMockPanel();
   initAlgorithms();
   initDump();
   initMCP();
-  initCounters();
   initReveal();
   initHero3D($('#hero-canvas'));
 }

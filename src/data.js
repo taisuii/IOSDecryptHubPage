@@ -1,10 +1,5 @@
 // Shared content data for IOSDecryptHub site.
 
-export const MARQUEE = [
-  'CommonCrypto', 'Security.framework', 'OpenSSL EVP', 'fishhook', 'Capstone 5.0.1',
-  'FairPlay dump', 'CCCryptor', 'SecKey', 'PBKDF2', 'dlsym redirect', 'Mach-O', 'MCP / JSON-RPC',
-];
-
 const ICON = {
   crypto: '<path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6l-9-4Z" stroke="currentColor" stroke-width="1.6"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
   file: '<path d="M6 3h8l4 4v14H6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v4h4M9 13h6M9 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',

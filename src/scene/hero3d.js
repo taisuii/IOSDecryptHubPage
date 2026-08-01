@@ -58,7 +58,7 @@ export function initHero3D(canvas) {
   const raven = createRavenModel(midGroup);
   const environment = createHeroEnvironment({ farGroup, nearGroup });
   const hero = canvas.closest('.hero');
-  const scanTrigger = hero?.querySelector('.btn--primary');
+  const scanTriggers = hero?.querySelectorAll('.install-copy') || [];
 
   const pointerTarget = { x: 0, y: 0 };
   const pointer = { x: 0, y: 0 };
@@ -79,8 +79,10 @@ export function initHero3D(canvas) {
     }, 900);
   }
 
-  scanTrigger?.addEventListener('pointerenter', startScan);
-  scanTrigger?.addEventListener('focus', startScan);
+  scanTriggers.forEach((trigger) => {
+    trigger.addEventListener('pointerenter', startScan);
+    trigger.addEventListener('focus', startScan);
+  });
 
   if (!reduceMotion) {
     window.addEventListener('pointermove', (event) => {

@@ -3,14 +3,14 @@ Label: IOSDecryptHub
 Suite: stable
 Version: 1.0
 Codename: ios
-Architectures: iphoneos-arm64
+Architectures: iphoneos-arm64 iphoneos-arm64e
 Components: main
 Description: IOSDecryptHub - iOS Runtime Security Analysis Tool
 MD5Sum:
- c7d8e460c8a80b8e45960ac1dd09a40c 771 Packages
- 27410c8fdd66a78df45e4eab70c10a39 446 Packages.gz
- 08fe6fb09dc7acfd576576966a32279e 503 Packages.bz2
+ d23df23ef2b31285a921694398e4c595 1543 Packages
+ 07f9990b4da598130ed4f701fb933153 563 Packages.gz
+ e5d72bd868dc6cb467d6dcab632e6c37 680 Packages.bz2
 SHA256:
- 7f9d44a18e7901c834d118e13c147cfc52bfd15cdadf55c2185bdb287b66dd90 771 Packages
- 411281a9cb1759053dba608faaf3362c1daa93e7a4ff634eeeb30ab2970bf612 446 Packages.gz
- ce7f79b755839b28ce620ccb2de0526dce00984579266189ed224193ced482be 503 Packages.bz2
+ 1772b510a36732bd2597ba6d1258d1edacfa48a771bdf3d9107aea6e01aa61db 1543 Packages
+ 3670899f76cfa4f6039b7ae2919628b97b758e1e744ecd1809e7930946b83504 563 Packages.gz
+ c8f654ef1913e150d6d1e2e901f12cc34bbe17d402cc868b9ef098520bd8c776 680 Packages.bz2

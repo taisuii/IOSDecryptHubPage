@@ -22,7 +22,7 @@
         {
           "class": "DepictionTableTextView",
           "title": "架构",
-          "text": "arm64 (rootless)"
+          "text": "arm64 / arm64e (rootless / roothide)"
         },
         {
           "class": "DepictionTableTextView",
@@ -42,7 +42,7 @@
       "views": [
         {
           "class": "DepictionMarkdownView",
-          "markdown": "## 1.23.6\n\n- 初始源发布\n- 支持 rootless 越狱环境（/var/jb）\n- fishhook + ObjC swizzle 引擎\n- 内嵌 HTTP + MCP 服务\n- 设置面板门控注入"
+          "markdown": "## 1.23.6\n\n- 同时提供普通 rootless 与 roothide 安装包\n- 按设备环境匹配 arm64 / arm64e 架构\n- fishhook + ObjC swizzle 引擎\n- 内嵌 HTTP + MCP 服务\n- 设置面板门控注入"
         }
       ]
     }
