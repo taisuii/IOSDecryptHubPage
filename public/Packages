@@ -1,6 +1,6 @@
 Package: com.iosdecrypthub
 Name: IOSDecryptHub
-Version: 1.23.7
+Version: 1.23.8
 Architecture: iphoneos-arm64e
 Description: iOS runtime security analysis tool (dylib injection via jailbreak)
 Maintainer: IOSDecryptHub
@@ -8,18 +8,18 @@ Author: IOSDecryptHub
 Section: Tweaks
 Depends: ellekit, preferenceloader
 Conflicts: com.iosdecrypthub.trollstore
-Filename: debs/com.iosdecrypthub_1.23.7_roothide.deb
-Size: 539048
-MD5sum: b1f0e69f0fa5c67f7540836fb75578be
-SHA1: 58bef40c71fd662c0e80d98055cb5ccbca14bae1
-SHA256: 2f09699a97711ee75f05cbb3f91e7e0cdf8e3d131f3c12080609e3275fb34ca8
+Filename: debs/com.iosdecrypthub_1.23.8_roothide.deb
+Size: 548588
+MD5sum: 25b30cb48c9b85990c3c6d4c6cb6651a
+SHA1: 66518c02689f8298bc435b1a337c3d230ae7b8c0
+SHA256: 6ca9afac9797caa5bac0de5a75a5f9ccb6c924c1335b7a5500d08c28fdfa1cd8
 Depiction: https://ios.decrypthub.com/depictions/com.iosdecrypthub/index.html
 SileoDepiction: https://ios.decrypthub.com/depictions/com.iosdecrypthub/sileo.json
 Icon: https://ios.decrypthub.com/depictions/com.iosdecrypthub/icon.png
 
 Package: com.iosdecrypthub
 Name: IOSDecryptHub
-Version: 1.23.7
+Version: 1.23.8
 Architecture: iphoneos-arm64
 Description: iOS runtime security analysis tool (dylib injection via jailbreak)
 Maintainer: IOSDecryptHub
@@ -27,11 +27,11 @@ Author: IOSDecryptHub
 Section: Tweaks
 Depends: ellekit, preferenceloader
 Conflicts: com.iosdecrypthub.trollstore
-Filename: debs/com.iosdecrypthub_1.23.7_rootless.deb
-Size: 399644
-MD5sum: f04051b2ce7833c401173684fd417968
-SHA1: 6e8acc3ec31100095b66553df4eb1a7979980165
-SHA256: 80cb319cf7a624b398d128bf0c4784e4b747cc315c8c906b859ba76125875e0a
+Filename: debs/com.iosdecrypthub_1.23.8_rootless.deb
+Size: 406268
+MD5sum: 11ccb00bb12e3b62c46bc86c32e9003a
+SHA1: 31722cd113083dccd31f9dc1896f747509956cf6
+SHA256: e489e23b4705f1a4719263606626f0a1bc296ba8449cdc151e9132209ec50651
 Depiction: https://ios.decrypthub.com/depictions/com.iosdecrypthub/index.html
 SileoDepiction: https://ios.decrypthub.com/depictions/com.iosdecrypthub/sileo.json
 Icon: https://ios.decrypthub.com/depictions/com.iosdecrypthub/icon.png

@@ -17,7 +17,7 @@
         {
           "class": "DepictionTableTextView",
           "title": "版本",
-          "text": "1.23.7"
+          "text": "1.23.8"
         },
         {
           "class": "DepictionTableTextView",
@@ -42,7 +42,7 @@
       "views": [
         {
           "class": "DepictionMarkdownView",
-          "markdown": "## 1.23.7\n\n- 修复 roothide 设置中不显示 IOSDecryptHub 入口\n- roothide 包改用随机 jbroot 兼容路径\n- 普通 rootless 继续使用 /var/jb 布局\n- 按设备环境匹配 arm64 / arm64e 架构"
+          "markdown": "## 1.23.8\n\n- 大型 App 的 xref 支持 48MB 分页扫描和覆盖诊断\n- 新增完整 dyld 镜像地图与 Objective-C 方法实体查询\n- IMP / 符号解析增加 PAC 归一化和真实镜像归属\n- 保持 rootless / roothide 双架构与现有 MCP 接口兼容"
         }
       ]
     }
