@@ -4,6 +4,7 @@ import { initMockPanel } from './panel.js';
 import {
   CAPABILITIES, ALGO_GROUPS, DUMP_STEPS, DUMP_NOTES,
   MCP_TOOLS,
+  DYLIB_DOWNLOAD,
 } from './data.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -54,7 +55,7 @@ async function copyText(text) {
 }
 
 function initInstall() {
-  $$('.install-copy').forEach((button) => button.addEventListener('click', async () => {
+  $$('.install-copy[data-copy]').forEach((button) => button.addEventListener('click', async () => {
     const originalLabel = button.getAttribute('aria-label');
     const status = $('.sr-only', button);
     try {
@@ -73,6 +74,21 @@ function initInstall() {
       status.textContent = '';
     }, 1400);
   }));
+}
+
+/* ---------------- dylib download ---------------- */
+function initDownload() {
+  const card = $('.hero-command--download');
+  if (!card) return;
+  const link = $('.install-copy--download', card);
+  const fileEl = $('.hero-command__line code', card);
+  const titleEl = $('.hero-command__meta strong', card);
+  link.href = DYLIB_DOWNLOAD.url;
+  link.setAttribute('download', DYLIB_DOWNLOAD.filename);
+  link.setAttribute('aria-label', `下载 ${DYLIB_DOWNLOAD.filename}`);
+  link.title = `SHA-256: ${DYLIB_DOWNLOAD.sha256}`;
+  fileEl.textContent = DYLIB_DOWNLOAD.filename;
+  titleEl.textContent = `下载 dylib v${DYLIB_DOWNLOAD.version}`;
 }
 
 /* ---------------- capabilities ---------------- */
@@ -170,6 +186,7 @@ function initMCP() {
 function boot() {
   initNav();
   initInstall();
+  initDownload();
   initCaps();
   initMockPanel();
   initAlgorithms();

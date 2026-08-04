@@ -9,6 +9,14 @@ const ICON = {
   health: '<path d="M3 12h4l2-6 4 12 2-6h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
 };
 
+export const DYLIB_DOWNLOAD = {
+  version: '1.23.8',
+  filename: 'decrypt_helper-1.23.8.dylib',
+  url: '/dylibs/decrypt_helper-1.23.8.dylib',
+  size: '2.2 MB',
+  sha256: '6fed40e0112bae207dad7e25f8313e071197b26dfddcf173246a22c6aa952bdc',
+};
+
 export const CAPABILITIES = [
   {
     icon: ICON.crypto, title: '加解密审计',
