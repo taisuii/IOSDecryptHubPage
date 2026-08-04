@@ -591,5 +591,173 @@ A \`void *ssl\` placeholder suffices—log the byte stream without parsing sessi
 In-process capture always sees the **plaintext business layer**, sharing the same call stacks and timeline as crypto and Keychain events.`,
     },
   },
+  {
+    slug: 'how-it-works-architecture',
+    date: '2026-08-04',
+    title: 'IOSDecryptHub 工作原理：从注入到分析的一条完整链路',
+    summary: '把前面几篇文章串起来：constructor 启动顺序为什么不能换、三种 hook 手段怎么分工、日志存储如何"在别人进程里不崩溃"、一个 8088 端口怎么承载面板与 MCP，以及跨事件时间窗关联。',
+    content: `前面几篇文章拆开了讲各个模块。这篇把它们串起来：注入的 dylib 在目标进程里，到底走了一条怎样的数据流。
+
+## 全景：一条链路
+
+\`\`\`
+hook (fishhook + swizzle + dlsym 重定向)
+  → 捕获与语义化 (算法解析 / 流式会话 / 行为事件)
+    → DHLogStore (分类环形缓冲 + 落盘滚动)
+      → HTTP 8088 (Web 面板 / /api/stats / MCP POST /api/mcp)
+        → idh (手动连接 + stdio 网关) → AI 客户端
+\`\`\`
+
+每一层只做一件事，层与层之间通过 \`DHLogEntry\` 传递。
+
+## 启动顺序：为什么不能换
+
+dylib 在 \`main()\` 之前通过 \`__attribute__((constructor))\` 启动，顺序是写死的：
+
+1. **预热 Foundation**：先调一次 \`DHTimestampNow()\` 和 \`DHCallStackFiltered()\`，强制完成 NSDateFormatter 与 backtrace 的懒加载；
+2. **加载配置**：\`.dh_capture.conf\`（捕获开关）、\`.dh_noise.conf\`（噪声规则）、\`.dh_spoof.conf\`（伪装配置），在装 hook 前就绪，持久化的开关从一开始就生效；
+3. **装 hook**：\`dh_install_all_hooks()\` 一次装完 12 类（摘要/HMAC/对称/非对称/KDF/EVP/文件/系统/网络/Keychain/dyld/dlsym）——要尽早，否则早期发生的加解密会漏抓；
+4. **起 HTTP 服务**：不依赖 UIApplication，立刻可访问；
+5. **悬浮窗**：等 \`UIApplicationDidFinishLaunching\` 通知后置初始化。
+
+顺序不能换的原因很实际：若先装 hook 再预热，\`hooked_open\` 内部首次触发 \`NSDateFormatter\` 懒加载会再次调用 \`open\`——无限递归（\`dh_in_hook\` 标志是第二道保险）。
+
+## Hook 引擎：三种手段各管一段
+
+- **fishhook**：改写 GOT / 懒符号表指针，管 C 函数——CommonCrypto、SecKey、EVP、open/write/dlopen 全走这里；
+- **ObjC swizzle**：runtime 换 IMP，管 ObjC 方法——\`NSURLSession\` 建任务、\`UIDevice.systemVersion\`、\`canOpenURL:\`；
+- **dlsym 重定向**：\`dlsym\` 解析到已 hook 符号时返回 wrapper，堵住函数指针旁路。
+
+三者共用"改指针不改指令"的边界：非越狱环境没有可执行内存权限，inline hook 物理上不可能。
+
+## 捕获与语义化
+
+原始参数没有意义，要翻译成可读记录：
+
+- 算法：\`alg\` 枚举 + \`keyLen\` → "AES-256-CBC"；\`kCCOptionECBMode\` → 模式；SecKey 从 CFDictionary 里抠 \`kSecAttrKeyType\`；
+- 流式：\`CCCryptorCreate/Update/Final\` 用会话表拼回完整明文；
+- 行为：文件路径、dlopen 的库名、请求 URL 与方法。
+
+每条记录带应用层调用栈、毫秒时间戳与线程 id——这三个字段是后面一切联动的基础。
+
+## 日志存储：分类缓冲 + 落盘滚动
+
+\`DHLogStore\` 的存储策略针对"宿主 App 不能死"设计：
+
+- **每类独立环形缓冲**：加解密、文件、系统、网络、Keychain 各占一个桶，一类高频事件不会挤爆别的类；
+- **噪声桶**：\`MGCopyAnswer\` 这类高频系统调用按规则分流到独立噪声板，不进主事件流；
+- **落盘**：常开 append 句柄（避免每条记录 open/close），单段 blob 上限 64KB；
+- **滚动**：超过 \`maxFileBytes\` 后滚动归档，保留 \`.1/.2/.3\` 最多三份——崩溃后可从落盘日志闭环取证（断连不清空）。
+
+## 服务层：一个端口承载全部
+
+HTTP 8088 一个监听端口同时服务三个角色：Web 面板（\`/\`）、健康与统计（\`/api/stats\`）、MCP（\`POST /api/mcp\`，Streamable HTTP）。不额外开端口，因为注入场景每多一个监听端口就多一分被 App 检测的风险。
+
+服务的每个动作都遵守"不崩溃原则"：内存读取用 \`vm_read_overwrite\` 防护，ObjC 层用 \`@try/@catch\`，日志与网络失败静默降级——dylib 运行在别人的进程里，任何 crash 都会杀死宿主 App。
+
+## 连接与协作：idh 网关
+
+设备端只做捕获与暴露，分析入口在 PC：
+
+- \`idh connect <设备 IP>:8088\` 手动指定设备（不做自动发现，降低复杂度）；
+- \`idh mcp\` 把 HTTP MCP 桥接成本机 stdio MCP，Codex / Claude 直接配置使用；
+- 网关提供 \`idh_list_devices\` / \`idh_call_tool\` 等固定工具集，AI 按 schema 确定性路由。
+
+## 跨事件关联：时间窗锚点
+
+网络与加解密共享时间线是这套设计最独特的地方。\`net_log_pair\` 记录的是**请求时刻**的毫秒时间戳与线程 id（不是响应到达时刻），\`correlate_request\` 以网络请求为锚点，聚合同一时间窗内的加解密与 Keychain 事件——一次登录请求的签名、加密、写 Keychain 全部落在同一条因果链上。
+
+## 铁律回顾
+
+- 只改指针，不改指令；
+- 无认证服务只在可信局域网使用；
+- 伪装与隐藏仅作用于本进程内；
+- 所有内存访问都有崩溃防护。
+
+这条链路从 \`main()\` 之前的第一行代码，到 AI 客户端读到的结构化事件，每一层都围绕同一个约束设计：**稳定地活在别人的进程里**。`,
+    en: {
+      title: 'How IOSDecryptHub works: one pipeline from injection to analysis',
+      summary: 'Wiring the previous posts together: why the constructor startup order cannot change, how the three hook tools divide the work, how the log store survives inside a foreign process, how one port serves the panel and MCP, and cross-event time-window correlation.',
+      content: `Previous articles dissected each module. This one wires them together: inside the target process, what data flow does the injected dylib actually follow?
+
+## The big picture: one pipeline
+
+\`\`\`
+hook (fishhook + swizzle + dlsym redirection)
+  → capture & semantics (algorithm parsing / streaming sessions / behavior events)
+    → DHLogStore (per-category ring buffers + rolling disk logs)
+      → HTTP 8088 (Web panel / /api/stats / MCP POST /api/mcp)
+        → idh (manual connect + stdio gateway) → AI clients
+\`\`\`
+
+Each layer does one thing; layers communicate via \`DHLogEntry\`.
+
+## Startup order: why it cannot change
+
+The dylib starts before \`main()\` via \`__attribute__((constructor))\`, in a fixed order:
+
+1. **Warm up Foundation**: call \`DHTimestampNow()\` and \`DHCallStackFiltered()\` once to force lazy loading of NSDateFormatter and backtrace;
+2. **Load config**: \`.dh_capture.conf\` (capture toggles), \`.dh_noise.conf\` (noise rules), \`.dh_spoof.conf\` (spoof config)—ready before hooks install, so persisted switches apply from the start;
+3. **Install hooks**: \`dh_install_all_hooks()\` installs all 12 families at once (digest/HMAC/symmetric/asymmetric/KDF/EVP/file/system/network/Keychain/dyld/dlsym)—as early as possible, or early crypto would be missed;
+4. **Start HTTP**: no UIApplication dependency, reachable immediately;
+5. **Floating window**: post-initialized on \`UIApplicationDidFinishLaunching\`.
+
+Why this exact order: if hooks were installed before the warm-up, the first NSDateFormatter lazy load inside \`hooked_open\` would call \`open\` again—infinite recursion (the \`dh_in_hook\` flag is the second safety net).
+
+## Hook engine: three tools, three layers
+
+- **fishhook**: rewrites GOT / lazy symbol pointers—C functions: CommonCrypto, SecKey, EVP, open/write/dlopen;
+- **ObjC swizzle**: runtime IMP swap—ObjC methods: \`NSURLSession\` task creation, \`UIDevice.systemVersion\`, \`canOpenURL:\`;
+- **dlsym redirection**: lookups of already-hooked symbols return the wrapper, closing the function-pointer bypass.
+
+All three share one boundary: "change pointers, not instructions". Without jailbreak, there is no executable memory—inline hooks are physically impossible.
+
+## Capture & semantics
+
+Raw arguments mean nothing; they must be translated:
+
+- Algorithms: \`alg\` enum + \`keyLen\` → "AES-256-CBC"; \`kCCOptionECBMode\` → mode; SecKey digs \`kSecAttrKeyType\` out of a CFDictionary;
+- Streaming: \`CCCryptorCreate/Update/Final\` sessions reassemble full plaintext;
+- Behavior: file paths, dlopen'd library names, request URLs and methods.
+
+Every record carries an app-level call stack, millisecond timestamp and thread id—the three fields everything downstream links on.
+
+## Log store: per-category buffers + rolling disk logs
+
+\`DHLogStore\` is designed around one constraint: **the host app must not die**.
+
+- **Per-category ring buffers**: crypto, file, system, network, Keychain each get their own bucket; one hot category cannot starve others;
+- **Noise buckets**: high-frequency system calls like \`MGCopyAnswer\` are diverted to noise boards by rule, off the main event stream;
+- **Disk**: a persistent append handle (no open/close per record); single blob capped at 64KB;
+- **Rolling**: past \`maxFileBytes\`, logs rotate keeping \`.1/.2/.3\`—crashes are closed-loop forensics (disconnects never clear logs).
+
+## Service layer: one port for everything
+
+HTTP 8088 serves three roles on one listener: the Web panel (\`/\`), health & stats (\`/api/stats\`), and MCP (\`POST /api/mcp\`, Streamable HTTP). No extra ports—every extra listener is one more detection surface for the injected process.
+
+Every service action obeys the no-crash rule: memory reads guarded by \`vm_read_overwrite\`, ObjC wrapped in \`@try/@catch\`, logging and network failures degrade silently—the dylib lives in someone else's process; any crash kills the host app.
+
+## Connection & collaboration: the idh gateway
+
+The device only captures and exposes; analysis entry is on the PC:
+
+- \`idh connect <device IP>:8088\`—manual device specification (no auto-discovery, less complexity);
+- \`idh mcp\` bridges HTTP MCP to local stdio MCP for Codex / Claude;
+- The gateway exposes a fixed toolset (\`idh_list_devices\` / \`idh_call_tool\`), deterministic routing by schema.
+
+## Cross-event correlation: the time-window anchor
+
+Network and crypto sharing one timeline is this design's most distinctive trait. \`net_log_pair\` records the **request-time** millisecond timestamp and thread id (not response time); \`correlate_request\` anchors on the network request and aggregates same-window crypto and Keychain events—one login request's signature, encryption and Keychain write all land on the same causal chain.
+
+## The rules, restated
+
+- Pointers only, never instructions;
+- Unauthenticated services stay on trusted LANs;
+- Spoofing and hiding act only within the process;
+- Every memory access has crash protection.
+
+From the first line before \`main()\` to the structured events an AI client reads, every layer is designed around the same constraint: **survive stably inside someone else's process**.`,
+    },
+  },
 ];
 
