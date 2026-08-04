@@ -472,20 +472,40 @@ code, pre { font-family: var(--mono); }
 .caps--docs { margin-top: 6px; }
 .docs__body .note { margin-top: 22px; }
 
-/* News timeline */
-.news { max-width: 860px; }
-.news-item { position: relative; padding: 0 0 44px 26px; border-left: 1px solid var(--line); }
-.news-item:last-child { padding-bottom: 8px; border-left-color: transparent; }
-.news-item::before { content: ''; position: absolute; left: -5px; top: 6px; width: 9px; height: 9px; background: var(--surface-2); border: 2px solid var(--blue); border-radius: 50%; }
-.news-item--latest::before { background: var(--blue); box-shadow: 0 0 0 5px rgba(120, 169, 255, .15); }
-.news-item__rail { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.news-item__rail time { color: var(--ink-3); font: 11px/1 var(--mono); }
-.news-item__tag { padding: 3px 8px; color: #050506; background: var(--blue); border-radius: 3px; font: 600 9px/1 var(--mono); }
-.news-item__body h2 { margin: 0 0 8px; font-size: 20px; font-weight: 620; }
-.news-item__meta { margin-bottom: 10px; }
-.news-item__meta code { padding: 2px 8px; color: var(--cyan); background: #10252b; border-radius: 3px; font: 600 11px/1.4 var(--mono); }
-.news-item__body ul { margin: 0; padding: 0 0 0 20px; color: var(--ink-3); font-size: 14px; line-height: 2; }
-.news-item__body li::marker { color: var(--blue); }
+/* News articles */
+.articles { max-width: 860px; display: flex; flex-direction: column; }
+.article-card { position: relative; display: block; padding: 26px 26px 22px 26px; margin-bottom: 16px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: var(--radius); transition: border-color .2s, transform .2s; }
+.article-card:hover { border-left-color: var(--blue); transform: translateY(-2px); }
+.article-card--latest { border-left-color: var(--blue); background: linear-gradient(180deg, #101a2b, var(--surface)); }
+.article-card__rail { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.article-card__rail time { color: var(--ink-3); font: 11px/1 var(--mono); }
+.article-card__tag { padding: 3px 8px; color: #050506; background: var(--blue); border-radius: 3px; font: 600 9px/1 var(--mono); }
+.article-card__body h2 { margin: 0 0 8px; font-size: 20px; font-weight: 620; line-height: 1.4; }
+.article-card__body p { margin: 0 0 14px; color: var(--ink-3); font-size: 14px; line-height: 1.8; }
+.article-card__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.article-card__meta code { padding: 2px 8px; color: var(--cyan); background: #10252b; border-radius: 3px; font: 600 10px/1.4 var(--mono); }
+.article-card__more { margin-left: auto; color: var(--blue); font: 600 11px/1.4 var(--mono); white-space: nowrap; }
+.article-card--latest .article-card__more { color: var(--ink); }
+
+/* Article detail */
+.article { max-width: 860px; }
+.article__back { display: inline-block; margin-bottom: 26px; color: var(--ink-3); font-size: 13px; transition: color .15s; }
+.article__back:hover { color: var(--ink); }
+.article__head { padding-bottom: 24px; margin-bottom: 30px; border-bottom: 1px solid var(--line); }
+.article__head h1 { margin: 0 0 14px; font-size: 34px; line-height: 1.25; font-weight: 650; }
+.article__body { min-width: 0; color: var(--ink-2); font-size: 15px; line-height: 2; }
+.article__body h2 { margin: 40px 0 14px; padding-top: 8px; color: var(--ink); font-size: 22px; font-weight: 640; }
+.article__body h3 { margin: 28px 0 10px; color: var(--ink); font-size: 17px; font-weight: 620; }
+.article__body h4 { margin: 24px 0 8px; color: var(--ink); font-size: 15px; font-weight: 620; }
+.article__body p { margin: 0 0 16px; }
+.article__body code { padding: 1px 6px; color: var(--cyan); background: #0c0e13; border: 1px solid var(--line-soft); border-radius: 3px; font-size: 13px; }
+.article__body ul, .article__body ol { margin: 0 0 16px; padding-left: 24px; }
+.article__body li { margin-bottom: 6px; }
+.article__body li::marker { color: var(--blue); }
+.article__body blockquote { margin: 22px 0; padding: 14px 18px; color: var(--ink-2); background: #0c0e13; border-left: 3px solid var(--blue); border-radius: 0 var(--radius) var(--radius) 0; }
+.article__body a { color: var(--blue); }
+.article__body a:hover { text-decoration: underline; }
+.article__code { margin: 18px 0; padding: 18px 20px; overflow-x: auto; color: var(--ink-2); background: #0c0e13; border: 1px solid var(--line); border-radius: var(--radius); font: 12px/1.8 var(--mono); white-space: pre; }
 
 @media (max-width: 1080px) {
   .docs { grid-template-columns: 1fr; gap: 28px; }

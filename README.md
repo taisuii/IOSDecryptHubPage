@@ -7,7 +7,7 @@ iOS App 运行时加解密审计平台。本站为交互式作品级站点，Vit
 
 - **首页 `/`**：3D 主视觉（Three.js 解密核心 + 扫描环）、直接下载 DYLIB、实时面板复刻、能力速览。
 - **文档 `/docs.html`**：安装与注入（TrollFools / IPA 重打包 / 越狱插件源 / idh 网关）、能力全景、算法覆盖矩阵、砸壳流水线、MCP · Capstone 36 工具。
-- **动态 `/news.html`**：版本发布与重要变更时间线（数据在 `src/data.js` 的 `NEWS_ITEMS`，发布新版本时追加一条）。
+- **动态 `/news.html`**：技术文章（markdown 渲染 + hash 路由），文章数据在 `src/news-data.js`，发布新文章时在数组末尾追加一条。
 
 ## 呈现内容
 
