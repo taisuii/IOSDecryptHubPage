@@ -1,5 +1,6 @@
 import './style.css';
 import { $, $$, renderChrome, initCopyButtons } from './layout.js';
+import { tpl } from './i18n.js';
 import { initHero3D } from './scene/hero3d.js';
 import { initMockPanel } from './panel.js';
 import { DYLIB_DOWNLOAD } from './data.js';
@@ -19,12 +20,14 @@ function initDownload() {
   const link = $('.install-copy--download', card);
   const fileEl = $('.hero-command__line code', card);
   const titleEl = $('.hero-command__meta strong', card);
+  const renderTitle = () => { titleEl.textContent = tpl('hero.dl.title', { ver: DYLIB_DOWNLOAD.version }); };
   link.href = DYLIB_DOWNLOAD.url;
   link.setAttribute('download', DYLIB_DOWNLOAD.filename);
-  link.setAttribute('aria-label', `下载 ${DYLIB_DOWNLOAD.filename}`);
+  link.setAttribute('aria-label', tpl('hero.dl.title', { ver: DYLIB_DOWNLOAD.version }));
   link.title = `SHA-256: ${DYLIB_DOWNLOAD.sha256}`;
   fileEl.textContent = DYLIB_DOWNLOAD.filename;
-  titleEl.textContent = `下载 dylib v${DYLIB_DOWNLOAD.version}`;
+  renderTitle();
+  document.addEventListener('idh:langchange', renderTitle);
 }
 
 /* ---------------- reveal on scroll ---------------- */
