@@ -20,8 +20,6 @@ export const DICT = {
     'hero.src.prompt': '源',
     'hero.idh.meta': 'macOS / Linux · Python 3.10+',
     'hero.idh.title': '安装 idh',
-    'hero.guide': '可用 TrollFools 直接注入，或重打包 IPA 后使用。',
-    'hero.trust': 'HTTP / MCP 服务不设认证，仅限授权测试与可信局域网；请勿将 8088 端口暴露到公网。',
     'hero.scroll': '向下滚动',
 
     'home.panel.kicker': '实时面板',
@@ -83,7 +81,6 @@ export const DICT = {
     'news.back': '← 返回文章列表',
 
     'foot.desc': '基于 fishhook 的 iOS App 运行时加解密审计与逆向分析平台。',
-    'foot.author': '插件作者',
     'foot.copy': '© 2026 IOSDecryptHub · 仅供授权安全测试与研究',
     'foot.built': 'Built with Vite · Three.js',
 
@@ -153,8 +150,6 @@ export const DICT = {
     'hero.src.prompt': 'repo',
     'hero.idh.meta': 'macOS / Linux · Python 3.10+',
     'hero.idh.title': 'Install idh',
-    'hero.guide': 'Inject directly with TrollFools, or repack the IPA yourself.',
-    'hero.trust': 'HTTP / MCP services have no authentication. Authorized testing only, trusted LAN only; never expose port 8088 to the internet.',
     'hero.scroll': 'Scroll down',
 
     'home.panel.kicker': 'Live Panel',
@@ -216,7 +211,6 @@ export const DICT = {
     'news.back': '← Back to list',
 
     'foot.desc': 'fishhook-based runtime crypto audit & reverse engineering platform for iOS apps.',
-    'foot.author': 'Plugin author',
     'foot.copy': '© 2026 IOSDecryptHub · For authorized security testing & research only',
     'foot.built': 'Built with Vite · Three.js',
 

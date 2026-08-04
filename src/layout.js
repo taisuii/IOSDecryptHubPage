@@ -78,7 +78,6 @@ export function renderChrome(active) {
           <div class="foot__brand">
             <span class="nav__word">IOSDecrypt<b>Hub</b></span>
             <p>${t('foot.desc')}</p>
-            <p class="foot__author">${t('foot.author')} · <a href="https://decrypthub.com">decrypthub.com</a></p>
           </div>
           <div class="foot__links">
             <a href="/docs.html">${t('nav.docs')}</a>
