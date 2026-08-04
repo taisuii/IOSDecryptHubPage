@@ -82,11 +82,10 @@
 
               <h3 data-i18n="docs.install.idh.h3">PC 端 · idh 网关</h3>
               <p data-i18n="docs.install.idh.p1">插件通过 UDP 信标广播自身地址。安装 idh 后无需手动输入设备 IP：</p>
-              <pre class="doc-code"><span class="c">#</span> pip install ios-decrypt-hub
-idh --devices
+              <pre class="doc-code">pip install ios-decrypt-hub
+idh connect &lt;设备 IP&gt;:8088
 idh mcp</pre>
               <p data-i18n="docs.install.idh.p2">idh mcp 把设备上的 HTTP MCP 转换为本机 stdio MCP，可直接作为 Codex、Claude 等 AI 客户端的固定 MCP 配置。</p>
-              <p class="note" data-i18n="docs.install.note">使用第三方注入器时，需要由宿主 App 或注入器提供 NSLocalNetworkUsageDescription 与 NSBonjourServices 两个 Info.plist 声明。</p>
             </section>
 
             <!-- ============ 能力全景 ============ -->
