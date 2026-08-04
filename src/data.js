@@ -389,3 +389,106 @@ export const PANEL_SYMBOLS = {
 export const PANEL_DUMP_IMAGES = [
   { name: 'CryptoTestHost', kind: '主程序', size: 139232, cryptid: 0, encrypted: false },
 ];
+
+// 更新动态（news）：依据主仓库真实发布历史整理的快照，发布新版本时追加一条。
+export const NEWS_ITEMS = [
+  {
+    version: 'v1.23.8', date: '2026-08-02', title: '大型镜像分析增强',
+    points: [
+      '大型 Mach-O 内存读取与符号解析性能增强',
+      '修复 roothide 设置入口安装路径',
+      '官网首页支持直接下载 dylib 与插件源',
+    ],
+  },
+  {
+    version: 'v1.23.6', date: '2026-08-01', title: '双架构越狱插件',
+    points: [
+      '发布 arm64 / arm64e 双架构越狱插件',
+      '越狱路线收敛为 rootless + roothide 双端，移除有根越狱',
+    ],
+  },
+  {
+    version: 'v1.23.0', date: '2026-07-25', title: 'UDP 信标自动发现',
+    points: [
+      'UDP 广播信标替代 Bonjour：注入场景无需 plist / entitlement 声明即可被 idh 自动发现',
+    ],
+  },
+  {
+    version: 'v1.22.0', date: '2026-07-25', title: '越狱 deb 打包',
+    points: [
+      'rootless / roothide .deb 打包，PreferenceLoader 设置开关控制注入',
+    ],
+  },
+  {
+    version: 'v1.20.1', date: '2026-07-10', title: '稳定性修复',
+    points: [
+      '修复 xref 扫描器裸指针崩溃与 cryptor OOM',
+      'harness 清场',
+    ],
+  },
+  {
+    version: 'v1.19.0', date: '2026-07-10', title: 'list_functions',
+    points: [
+      '新增 list_functions（tier-3B）：暴露 LC_FUNCTION_STARTS 函数清单，strip 后仍可列出',
+    ],
+  },
+  {
+    version: 'v1.15.0', date: '2026-07-09', title: 'MCP 集成测试套件',
+    points: [
+      '新增 MCP / analysis / correlate / auth 集成测试套件',
+      '修复布尔序列化 bug',
+    ],
+  },
+  {
+    version: 'v1.12.0', date: '2026-07-09', title: 'MCP 取证平台 + Capstone',
+    points: [
+      '集成 Capstone 反汇编，MCP 服务器经 HTTP 暴露给 AI 客户端',
+      '请求响应配对 + 网络抓包',
+    ],
+  },
+  {
+    version: 'v1.9.1', date: '2026-06-30', title: '取证闭环',
+    points: [
+      '断连不再清空日志',
+      '暴露完整落盘日志下载，崩溃可闭环取证',
+    ],
+  },
+  {
+    version: 'v1.8.1', date: '2026-06-30', title: '砸壳产物优化',
+    points: [
+      '砸壳打包跳过 FairPlay / SC_Info 残渣',
+      '产物去后缀，隐藏误导性 cryptid 状态',
+    ],
+  },
+  {
+    version: 'v1.7.0', date: '2026-06-30', title: '面板重构',
+    points: [
+      '面板每板块独立 + 捕获勾选 + 审查日志分板块',
+      '前端迁至真实数据源',
+    ],
+  },
+  {
+    version: 'v1.6.0', date: '2026-06-30', title: '砸壳功能发布',
+    points: [
+      '进程内 FairPlay 脱壳：内核已解密内存写回磁盘，cryptid 置 0',
+    ],
+  },
+  {
+    version: 'v1.5.0', date: '2026-06-23', title: '行为监控扩展',
+    points: [
+      '新增网络 / 文件 / 系统三类监控',
+    ],
+  },
+  {
+    version: 'v1.4.0', date: '2026-06-23', title: '行为监控平台',
+    points: [
+      '升级为 IOSDecryptHub 行为监控平台',
+    ],
+  },
+  {
+    version: 'v1.1.0', date: '2026-06-18', title: '内置 Web 面板',
+    points: [
+      '内置本地 HTTP 服务 + Web 日志面板',
+    ],
+  },
+];

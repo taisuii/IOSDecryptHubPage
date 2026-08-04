@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="IOSDecryptHub 更新动态 — 版本发布与重要变更记录。"
+    />
+    <meta name="theme-color" content="#050506" />
+    <title>动态 · IOSDecryptHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <!-- ================= NAV ================= -->
+    <header class="nav nav--solid" id="nav"></header>
+
+    <main id="top" class="sub">
+      <div class="wrap">
+        <header class="sub__head reveal">
+          <span class="sub__kicker">NEWS · 动态</span>
+          <h1>更新动态</h1>
+          <p>版本发布与重要变更记录，最新版本 <strong class="sub__ver" id="latest-version">v1.23.8</strong>。</p>
+        </header>
+        <div class="news reveal" id="news-list"></div>
+      </div>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="foot" id="foot"></footer>
+
+    <script type="module" src="/src/news.js"></script>
+  </body>
+</html>

@@ -1,7 +1,13 @@
 # IOSDecryptHub · 官网
 
 IOSDecryptHub 的官方网站——一个基于 fishhook 的
-iOS App 运行时加解密审计平台。本站为交互式作品级单页，Vite + Three.js 构建。
+iOS App 运行时加解密审计平台。本站为交互式作品级站点，Vite + Three.js 构建。
+
+## 页面结构
+
+- **首页 `/`**：3D 主视觉（Three.js 解密核心 + 扫描环）、直接下载 DYLIB、实时面板复刻、能力速览。
+- **文档 `/docs.html`**：安装与注入（TrollFools / IPA 重打包 / 越狱插件源 / idh 网关）、能力全景、算法覆盖矩阵、砸壳流水线、MCP · Capstone 36 工具。
+- **动态 `/news.html`**：版本发布与重要变更时间线（数据在 `src/data.js` 的 `NEWS_ITEMS`，发布新版本时追加一条）。
 
 ## 呈现内容
 
@@ -9,10 +15,10 @@ iOS App 运行时加解密审计平台。本站为交互式作品级单页，Vit
 - **首页直接下载 DYLIB**：TrollStore 注入器选目标 App 即可注入。
 - **实时捕获流**：模拟 App 调用加密 API 的结构化事件流 + master-detail 详情。
 - **交互式 Web 面板复刻**：加解密 / 文件 / 系统 / 符号 / Dump 五 tab 可切换。
-- **算法覆盖矩阵**：摘要 / HMAC / 对称 / OpenSSL EVP / 非对称 / KDF。
-- **砸壳流水线**：FairPlay 内存脱壳四步可视化。
-- **MCP · Capstone 工具集**：11 个反汇编 / xref 工具的 JSON-RPC 交互演示。
-- **fail-loud 健康监控**、**三步上手**。
+- **算法覆盖矩阵**：摘要 / HMAC / 对称 / OpenSSL EVP / 非对称 / KDF（文档页）。
+- **砸壳流水线**：FairPlay 内存脱壳四步可视化（文档页）。
+- **MCP · Capstone 工具集**：36 个工具（11 个反汇编 / xref + 取证 / 沙盒 / 控制）的 JSON-RPC 交互演示（文档页）。
+- **fail-loud 健康监控**。
 
 ## 本地开发
 

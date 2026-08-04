@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="IOSDecryptHub 使用文档 — 下载与注入、TrollFools / 重打包 / 插件源三种安装方式、能力全景、算法覆盖、砸壳与 MCP 工具说明。"
+    />
+    <meta name="theme-color" content="#050506" />
+    <title>文档 · IOSDecryptHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <!-- ================= NAV ================= -->
+    <header class="nav nav--solid" id="nav"></header>
+
+    <main id="top" class="sub">
+      <div class="wrap">
+        <header class="sub__head reveal">
+          <span class="sub__kicker">DOCS · 文档</span>
+          <h1>使用文档</h1>
+          <p>从注入到取证：安装方式、能力全景、算法覆盖、砸壳流程与 MCP 工具说明。</p>
+        </header>
+
+        <div class="docs">
+          <aside class="toc reveal" aria-label="文档目录">
+            <a href="#start" class="active">快速开始</a>
+            <a href="#install">安装与注入</a>
+            <a href="#capabilities">能力全景</a>
+            <a href="#algorithms">算法覆盖</a>
+            <a href="#dump">砸壳 / 脱壳</a>
+            <a href="#mcp">MCP 工具</a>
+            <a href="#security">安全与合规</a>
+          </aside>
+
+          <div class="docs__body">
+            <!-- ============ 快速开始 ============ -->
+            <section id="start">
+              <h2>快速开始</h2>
+              <ol class="start__steps">
+                <li>
+                  <b>下载 dylib</b>
+                  <p>从<a href="/" class="doclink">官网首页</a>或 <a href="https://github.com/taisuii/ios-decrypt-helper/releases" class="doclink">GitHub Releases</a> 下载 <code>decrypt_helper.dylib</code>。</p>
+                </li>
+                <li>
+                  <b>注入目标 App</b>
+                  <p>TrollFools 直接注入，或重打包 IPA 后安装。</p>
+                </li>
+                <li>
+                  <b>打开面板</b>
+                  <p>启动目标 App，在同一局域网的浏览器访问 <code>http://&lt;设备 IP&gt;:8088</code>。</p>
+                </li>
+              </ol>
+              <p class="note">仅限自有 App 或已获授权的安全测试与研究。</p>
+            </section>
+
+            <!-- ============ 安装与注入 ============ -->
+            <section id="install">
+              <h2>安装与注入</h2>
+
+              <h3>方式一 · TrollFools 巨魔注入（推荐）</h3>
+              <p>适用于已通过 TrollStore 安装巨魔注入器的设备：</p>
+              <ol class="prose-list">
+                <li>在巨魔注入器中选择目标 App。</li>
+                <li>添加 <code>decrypt_helper.dylib</code> 并执行注入。</li>
+                <li>启动目标 App。</li>
+                <li>在同一局域网的浏览器访问 <code>http://&lt;设备 IP&gt;:8088</code>。</li>
+              </ol>
+              <p>不同注入器的界面可能略有差异，核心操作都是将 dylib 注入目标 App 后重新启动 App。</p>
+
+              <h3>方式二 · IPA 重打包</h3>
+              <p>macOS 先安装 <code>insert_dylib</code>：</p>
+              <pre class="doc-code"><span class="c">#</span> brew install insert_dylib
+<span class="c">#</span> 执行仓库内置脚本
+./scripts/inject.sh &lt;input.ipa&gt; decrypt_helper.dylib</pre>
+              <p>脚本会生成 <code>hooked_&lt;input&gt;.ipa</code>，用 TrollStore、Sideloadly 或 AltStore 安装 / 重签后启动 App，再访问 <code>http://&lt;设备 IP&gt;:8088</code>。</p>
+
+              <h3>方式三 · 越狱插件源</h3>
+              <p>在包管理器（Sileo / Zebra）中添加插件源 <code>https://ios.decrypthub.com/</code>，安装 <code>com.iosdecrypthub</code>，然后在「设置 → IOSDecryptHub」中选择要注入的 App。支持 rootless / roothide 双端。</p>
+
+              <h3>PC 端 · idh 网关</h3>
+              <p>插件通过 UDP 信标广播自身地址。安装 <code>idh</code> 后无需手动输入设备 IP：</p>
+              <pre class="doc-code">pip install ios-decrypt-hub
+idh --devices
+idh mcp</pre>
+              <p><code>idh mcp</code> 把设备上的 HTTP MCP 转换为本机 stdio MCP，可直接作为 Codex、Claude 等 AI 客户端的固定 MCP 配置。</p>
+              <p class="note">使用第三方注入器时，需要由宿主 App 或注入器提供 <code>NSLocalNetworkUsageDescription</code> 与 <code>NSBonjourServices</code> 两个 Info.plist 声明。</p>
+            </section>
+
+            <!-- ============ 能力全景 ============ -->
+            <section id="capabilities">
+              <h2>能力全景</h2>
+              <p>同一条运行时链路，六种观察视角。拦截的是 CommonCrypto、Security.framework、OpenSSL EVP 三套系统库，以及沙盒文件与动态库加载；再叠加进程内砸壳与 Capstone 反汇编。同名接口在 macOS 与 iOS 上通用。</p>
+              <div class="caps caps--docs" id="caps-grid"></div>
+            </section>
+
+            <!-- ============ 算法覆盖 ============ -->
+            <section id="algorithms">
+              <h2>算法覆盖</h2>
+              <p>摘要、HMAC、对称、非对称、KDF 全线覆盖；流式 Init / Update / Final 会把分片喂入的数据拼回完整明文。目标若链接 libcrypto，OpenSSL EVP 对称也一并接管。</p>
+              <div class="algo" id="algo-grid"></div>
+            </section>
+
+            <!-- ============ 砸壳 ============ -->
+            <section id="dump">
+              <h2>砸壳 / 脱壳</h2>
+              <p>FairPlay 加密的 <code>__TEXT</code> 在运行时已被内核解密进内存。按需触发——不点按钮就不跑，零额外开销——把已解密的页写回磁盘，并将 cryptid 置 0。产出可直接喂给 IDA / Ghidra，或重打包成可重签 IPA。</p>
+              <div class="pipe" id="dump-pipe"></div>
+              <div class="pipe__notes" id="dump-notes"></div>
+            </section>
+
+            <!-- ============ MCP ============ -->
+            <section id="mcp">
+              <h2>MCP 工具</h2>
+              <p>注入的 dylib 内置一个 MCP (Model Context Protocol) 服务器，复用 8088 端口。36 个工具覆盖 Capstone 分析、内存与符号、运行时事件、沙盒文件、砸壳、捕获控制和配置。选一个工具查看调用方式。</p>
+              <div class="mcp">
+                <ul class="mcp__list" id="mcp-list" role="tablist" aria-label="MCP 工具"></ul>
+                <div class="mcp__stage">
+                  <div class="mcp__panelhead">
+                    <span class="mcp__name" id="mcp-name">disassemble</span>
+                    <span class="mcp__req" id="mcp-req"></span>
+                  </div>
+                  <p class="mcp__desc" id="mcp-desc"></p>
+                  <div class="mcp__io">
+                    <div class="mcp__col">
+                      <span class="mcp__lbl">tools/call</span>
+                      <pre class="mcp__code" id="mcp-in"></pre>
+                    </div>
+                    <div class="mcp__col">
+                      <span class="mcp__lbl">result</span>
+                      <pre class="mcp__code mcp__code--out" id="mcp-out"></pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============ 安全与合规 ============ -->
+            <section id="security">
+              <h2>安全与合规</h2>
+              <ul class="prose-list">
+                <li>Web 与 MCP 服务默认监听 <code>0.0.0.0:8088</code>，没有身份认证，请仅在可信局域网中使用，不要暴露到公网。</li>
+                <li>注入、重签和脱壳能力受设备环境及目标 App 保护机制影响。</li>
+                <li>请勿将捕获到的 Key、口令、明文或其他敏感数据提交到公开 Issue。</li>
+              </ul>
+              <p>遇到问题可在 <a href="https://github.com/taisuii/ios-decrypt-helper/issues/new/choose" class="doclink">GitHub Issues</a> 反馈。</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="foot" id="foot"></footer>
+
+    <script type="module" src="/src/docs.js"></script>
+  </body>
+</html>
