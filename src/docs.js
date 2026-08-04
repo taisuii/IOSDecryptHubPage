@@ -1,20 +1,26 @@
 import './style.css';
 import { $, $$, el, renderChrome, initCopyButtons } from './layout.js';
-import { CAPABILITIES, ALGO_GROUPS, DUMP_STEPS, DUMP_NOTES, MCP_TOOLS } from './data.js';
+import { t, tpl, getLang, initI18n } from './i18n.js';
+import { CAPABILITIES, ALGO_GROUPS, MCP_TOOLS } from './data.js';
+
+const isEn = () => getLang() === 'en';
 
 /* ---------------- capabilities ---------------- */
 function initCaps() {
   const grid = $('#caps-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
   CAPABILITIES.forEach((c, index) => {
-    const card = el('article', 'cap reveal');
+    const d = isEn() ? c.en : c;
+    const card = el('article', 'cap');
     card.innerHTML = `
       <div class="cap__bar">
         <span class="cap__num">0${index + 1}</span>
         <div class="cap__ico"><svg viewBox="0 0 24 24" fill="none">${c.icon}</svg></div>
       </div>
-      <h3>${c.title}</h3>
-      <p>${c.desc}</p>
-      <div class="cap__tags">${c.tags.map((t) => `<span>${t}</span>`).join('')}</div>`;
+      <h3>${d.title}</h3>
+      <p>${d.desc}</p>
+      <div class="cap__tags">${d.tags.map((tag) => `<span>${tag}</span>`).join('')}</div>`;
     grid.appendChild(card);
   });
 }
@@ -22,34 +28,15 @@ function initCaps() {
 /* ---------------- algorithms ---------------- */
 function initAlgorithms() {
   const grid = $('#algo-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
   ALGO_GROUPS.forEach((g) => {
-    const col = el('div', 'acol reveal');
+    const col = el('div', 'acol');
     col.innerHTML = `
-      <div class="acol__h"><b>${g.title}</b><span>${g.items.length}</span></div>
+      <div class="acol__h"><b>${isEn() ? g.enTitle : g.title}</b><span>${g.items.length}</span></div>
       <div>${g.items.map((i) => `<span class="achip">${i}</span>`).join('')}</div>
-      <div class="acol__foot">${g.note}</div>`;
+      <div class="acol__foot">${isEn() ? g.enNote : g.note}</div>`;
     grid.appendChild(col);
-  });
-}
-
-/* ---------------- dump pipeline ---------------- */
-function initDump() {
-  const pipe = $('#dump-pipe');
-  DUMP_STEPS.forEach((s) => {
-    const step = el('div', 'pstep reveal');
-    step.innerHTML = `
-      <div class="pstep__n">${s.n}</div>
-      <div class="pstep__ico"><svg viewBox="0 0 24 24" fill="none">${s.icon}</svg></div>
-      <h4>${s.title}</h4>
-      <p>${s.desc}</p>
-      <span class="pstep__arrow"><svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M5 12h13m0 0-5-5m5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
-    pipe.appendChild(step);
-  });
-  const notes = $('#dump-notes');
-  DUMP_NOTES.forEach((n) => {
-    const note = el('div', 'pnote reveal' + (n.good ? ' good' : ''));
-    note.innerHTML = `<b>${n.label}</b><span>${n.text}</span>`;
-    notes.appendChild(note);
   });
 }
 
@@ -64,6 +51,7 @@ function highlightJSON(str) {
 }
 function initMCP() {
   const listHost = $('#mcp-list');
+  if (!listHost) return;
   const nameEl = $('#mcp-name');
   const reqEl = $('#mcp-req');
   const descEl = $('#mcp-desc');
@@ -75,12 +63,13 @@ function initMCP() {
     item.classList.add('active');
     item.setAttribute('aria-selected', 'true');
     nameEl.textContent = tool.name;
-    reqEl.textContent = 'required: ' + tool.req;
-    descEl.textContent = tool.desc;
+    reqEl.textContent = tpl('docs.mcp.req', { r: tool.req });
+    descEl.textContent = isEn() && tool.desc_en ? tool.desc_en : tool.desc;
     inEl.innerHTML = highlightJSON(tool.in);
     outEl.innerHTML = highlightJSON(tool.out);
   }
 
+  listHost.innerHTML = '';
   MCP_TOOLS.forEach((tool, i) => {
     const item = el('li', 'mcp__item' + (i === 0 ? ' active' : ''));
     item.setAttribute('role', 'tab');
@@ -94,6 +83,7 @@ function initMCP() {
 /* ---------------- toc scrollspy ---------------- */
 function initToc() {
   const links = [...$$('.toc a')];
+  if (!links.length) return;
   const sections = links.map((a) => $(a.getAttribute('href'))).filter(Boolean);
   const setActive = (id) => {
     links.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
@@ -126,10 +116,15 @@ function boot() {
   initCopyButtons();
   initCaps();
   initAlgorithms();
-  initDump();
   initMCP();
   initToc();
   initReveal();
+  initI18n();
+  document.addEventListener('idh:langchange', () => {
+    initCaps();
+    initAlgorithms();
+    initMCP();
+  });
 }
 
 if (document.readyState === 'loading') {

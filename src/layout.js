@@ -1,4 +1,5 @@
 // Shared chrome (nav + footer) for all pages. Zero-dependency vanilla JS.
+import { t, getLang, setLang, initI18n } from './i18n.js';
 
 export const $ = (s, r = document) => r.querySelector(s);
 export const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -10,9 +11,9 @@ export const el = (tag, cls, html) => {
 };
 
 const NAV_LINKS = [
-  { href: '/', label: '首页', key: 'home' },
-  { href: '/docs.html', label: '文档', key: 'docs' },
-  { href: '/news.html', label: '动态', key: 'news' },
+  { href: '/', label: 'nav.home', key: 'home' },
+  { href: '/docs.html', label: 'nav.docs', key: 'docs' },
+  { href: '/news.html', label: 'nav.news', key: 'news' },
 ];
 
 const BRAND_SVG = `<svg viewBox="0 0 281 251" width="20" height="18" fill="currentColor" aria-hidden="true">
@@ -36,42 +37,66 @@ export function renderChrome(active) {
   const nav = $('#nav');
   if (nav) {
     nav.innerHTML = `
-      <a class="nav__brand" href="/" aria-label="IOSDecryptHub 首页">
+      <a class="nav__brand" href="/" aria-label="IOSDecryptHub">
         <span class="nav__mark" aria-hidden="true">${BRAND_SVG}</span>
         <span class="nav__word">IOSDecrypt<b>Hub</b></span>
       </a>
-      <nav class="nav__links" aria-label="主导航">
-        ${NAV_LINKS.map((l) => `<a href="${l.href}"${l.key === active ? ' class="active"' : ''}>${l.label}</a>`).join('')}
+      <nav class="nav__links" aria-label="navigation">
+        ${NAV_LINKS.map((l) => `<a href="${l.href}"${l.key === active ? ' class="active"' : ''}>${t(l.label)}</a>`).join('')}
       </nav>
-      <button class="nav__burger" id="burger" aria-label="菜单" type="button">
+      <button type="button" class="nav__lang" id="lang-btn" aria-label="${t('lang.label')}">${t('lang.switch')}</button>
+      <button class="nav__burger" id="burger" aria-label="menu" type="button">
         <span></span><span></span><span></span>
       </button>`;
-    const burger = $('#burger');
-    burger?.addEventListener('click', () => nav.classList.toggle('open'));
+    $('#lang-btn')?.addEventListener('click', () => {
+      setLang(getLang() === 'zh' ? 'en' : 'zh');
+    });
+    $('#burger')?.addEventListener('click', () => nav.classList.toggle('open'));
     $$('.nav__links a', nav).forEach((a) => a.addEventListener('click', () => nav.classList.remove('open')));
+    // keep links + switch label in sync when language changes
+    document.addEventListener('idh:langchange', () => {
+      const linksEl = $('.nav__links', nav);
+      if (linksEl) {
+        linksEl.innerHTML = NAV_LINKS
+          .map((l) => `<a href="${l.href}"${l.key === active ? ' class="active"' : ''}>${t(l.label)}</a>`)
+          .join('');
+        $$('.nav__links a', nav).forEach((a) => a.addEventListener('click', () => nav.classList.remove('open')));
+      }
+      const btn = $('#lang-btn');
+      if (btn) {
+        btn.textContent = t('lang.switch');
+        btn.setAttribute('aria-label', t('lang.label'));
+      }
+    });
   }
 
   const foot = $('#foot');
   if (foot) {
-    foot.innerHTML = `
-      <div class="wrap foot__grid">
-        <div class="foot__brand">
-          <span class="nav__word">IOSDecrypt<b>Hub</b></span>
-          <p>基于 fishhook 的 iOS App 运行时加解密审计与逆向分析平台。</p>
-          <p class="foot__author">插件作者 · <a href="https://decrypthub.com">decrypthub.com</a></p>
+    const renderFoot = () => {
+      foot.innerHTML = `
+        <div class="wrap foot__grid">
+          <div class="foot__brand">
+            <span class="nav__word">IOSDecrypt<b>Hub</b></span>
+            <p>${t('foot.desc')}</p>
+            <p class="foot__author">${t('foot.author')} · <a href="https://decrypthub.com">decrypthub.com</a></p>
+          </div>
+          <div class="foot__links">
+            <a href="/docs.html">${t('nav.docs')}</a>
+            <a href="/news.html">${t('nav.news')}</a>
+            <a href="https://github.com/taisuii/IOSDecryptHub">GitHub</a>
+            <a href="https://github.com/taisuii/ios-decrypt-helper/releases">Releases</a>
+          </div>
         </div>
-        <div class="foot__links">
-          <a href="/docs.html">文档</a>
-          <a href="/news.html">动态</a>
-          <a href="https://github.com/taisuii/IOSDecryptHub">GitHub</a>
-          <a href="https://github.com/taisuii/ios-decrypt-helper/releases">Releases</a>
-        </div>
-      </div>
-      <div class="wrap foot__base">
-        <span>© 2026 IOSDecryptHub · 仅供授权安全测试与研究</span>
-        <span>Built with Vite · Three.js</span>
-      </div>`;
+        <div class="wrap foot__base">
+          <span>${t('foot.copy')}</span>
+          <span>${t('foot.built')}</span>
+        </div>`;
+    };
+    renderFoot();
+    document.addEventListener('idh:langchange', renderFoot);
   }
+
+  initI18n();
 }
 
 export function initCopyButtons() {

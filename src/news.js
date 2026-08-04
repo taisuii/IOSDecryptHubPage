@@ -1,5 +1,6 @@
 import './style.css';
 import { $, el, renderChrome } from './layout.js';
+import { t, initI18n } from './i18n.js';
 import { NEWS_ARTICLES } from './news-data.js';
 import { renderMarkdown } from './markdown.js';
 
@@ -18,14 +19,14 @@ function renderList() {
     card.innerHTML = `
       <div class="article-card__rail">
         <time datetime="${a.date}">${a.date}</time>
-        ${i === 0 ? '<span class="article-card__tag">最新</span>' : ''}
+        ${i === 0 ? `<span class="article-card__tag">${t('news.latest')}</span>` : ''}
       </div>
       <div class="article-card__body">
         <h2>${escapeHtml(a.title)}</h2>
         <p>${escapeHtml(a.summary)}</p>
         <div class="article-card__meta">
-          ${a.tags.map((t) => `<code>${escapeHtml(t)}</code>`).join('')}
-          <span class="article-card__more">阅读全文 →</span>
+          ${a.tags.map((tag) => `<code>${escapeHtml(tag)}</code>`).join('')}
+          <span class="article-card__more">${t('news.readmore')}</span>
         </div>
       </div>`;
     root.appendChild(card);
@@ -39,14 +40,14 @@ function renderArticle(slug) {
   if (!a) { renderList(); return; }
   root.className = 'article';
   root.innerHTML = `
-    <a class="article__back" href="#/">← 返回文章列表</a>
+    <a class="article__back" href="#/">${t('news.back')}</a>
     <header class="article__head">
       <div class="article-card__rail">
         <time datetime="${a.date}">${a.date}</time>
-        <span class="article-card__tag">文章</span>
+        <span class="article-card__tag">${t('news.article')}</span>
       </div>
       <h1>${escapeHtml(a.title)}</h1>
-      <div class="article-card__meta">${a.tags.map((t) => `<code>${escapeHtml(t)}</code>`).join('')}</div>
+      <div class="article-card__meta">${a.tags.map((tag) => `<code>${escapeHtml(tag)}</code>`).join('')}</div>
     </header>
     <div class="article__body">${renderMarkdown(a.content)}</div>`;
   root.querySelector('.article__back').addEventListener('click', (e) => {
@@ -69,8 +70,10 @@ function route() {
 /* ---------------- boot ---------------- */
 function boot() {
   renderChrome('news');
+  initI18n();
   route();
   window.addEventListener('hashchange', route);
+  document.addEventListener('idh:langchange', route);
 }
 
 if (document.readyState === 'loading') {

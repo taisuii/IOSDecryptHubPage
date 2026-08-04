@@ -33,17 +33,17 @@
           <div class="hero__copy">
             <h1 class="hero__title reveal">
               IOSDecryptHub<br />
-              <span class="grad">看见运行时的真相</span>
+              <span class="grad" data-i18n="hero.title2">看见运行时的真相</span>
             </h1>
             <p class="hero__sub reveal">
-              设备安装运行时插件，电脑安装 <code>idh</code>。连接同一可信局域网，即可发现 App 并开始分析。
+              <span data-i18n="hero.sub.1">设备安装运行时插件，电脑安装 </span><code>idh</code><span data-i18n="hero.sub.2">。连接同一可信局域网，即可发现 App 并开始分析。</span>
             </p>
 
             <div class="hero__install reveal" aria-label="安装命令">
               <div class="hero-command hero-command--download">
                 <div class="hero-command__meta">
-                  <span>iOS 14.0+ · arm64 · TrollStore 注入器</span>
-                  <strong>下载 dylib v1.23.8</strong>
+                  <span data-i18n="hero.dl.meta">iOS 14.0+ · arm64 · TrollStore 注入器</span>
+                  <strong data-i18n="hero.dl.title">下载 dylib v1.23.8</strong>
                 </div>
                 <div class="hero-command__line">
                   <span class="hero-command__prompt">dylib</span>
@@ -62,8 +62,8 @@
 
               <div class="hero-command hero-command--plugin">
                 <div class="hero-command__meta">
-                  <span>iOS 14.0+ · rootless / roothide</span>
-                  <strong>添加插件源</strong>
+                  <span data-i18n="hero.src.meta">iOS 14.0+ · rootless / roothide</span>
+                  <strong data-i18n="hero.src.title">添加插件源</strong>
                 </div>
                 <div class="hero-command__line">
                   <span class="hero-command__prompt">源</span>
@@ -84,8 +84,8 @@
 
               <div class="hero-command">
                 <div class="hero-command__meta">
-                  <span>macOS / Linux · Python 3.10+</span>
-                  <strong>安装 idh</strong>
+                  <span data-i18n="hero.idh.meta">macOS / Linux · Python 3.10+</span>
+                  <strong data-i18n="hero.idh.title">安装 idh</strong>
                 </div>
                 <div class="hero-command__line">
                   <span class="hero-command__prompt">$</span>
@@ -105,11 +105,11 @@
               </div>
             </div>
 
-            <p class="hero__guide reveal">
+            <p class="hero__guide reveal" data-i18n="hero.guide">
               可用 TrollFools 直接注入，或重打包 IPA 后使用。
             </p>
 
-            <p class="hero__trust reveal">
+            <p class="hero__trust reveal" data-i18n="hero.trust">
               HTTP / MCP 服务不设认证，仅限授权测试与可信局域网；请勿将 8088 端口暴露到公网。
             </p>
           </div>
@@ -118,16 +118,16 @@
             <span></span><span></span><span></span>
           </div>
         </div>
-        <div class="hero__scroll" aria-hidden="true"><span></span>向下滚动</div>
+        <div class="hero__scroll" aria-hidden="true"><span></span><b data-i18n="hero.scroll">向下滚动</b></div>
       </section>
 
       <!-- ================= INTERACTIVE PANEL ================= -->
       <section class="section section--panel" id="panel">
         <div class="wrap">
           <header class="head reveal">
-            <span class="head__kicker">实时面板</span>
-            <h2 class="head__title">插件里的运行时控制台，直接在这里操作</h2>
-            <p class="head__lead">
+            <span class="head__kicker" data-i18n="home.panel.kicker">实时面板</span>
+            <h2 class="head__title" data-i18n="home.panel.title">插件里的运行时控制台，直接在这里操作</h2>
+            <p class="head__lead" data-i18n="home.panel.lead">
               界面与插件内置页面保持一致。切换页签、筛选与搜索测试 IPA 产生的日志，点任意记录查看
               Key、IV、输入输出、HexDump 与调用栈。
             </p>

@@ -5,14 +5,16 @@ import {
   PANEL_SYMBOLS,
   PANEL_TABS,
 } from './data.js';
+import { t, tpl } from './i18n.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const LOG_TABS = PANEL_TABS.filter((tab) => Array.isArray(tab.rows));
 const CAT_NAMES = {
-  digest: '摘要', hmac: 'HMAC', symm: '对称', asym: '非对称', kdf: 'KDF',
-  file: '文件', sys: '系统', net: '网络', keychain: 'Keychain',
+  digest: 'panel.cat.digest', hmac: 'panel.cat.hmac', symm: 'panel.cat.symm', asym: 'panel.cat.asym', kdf: 'panel.cat.kdf',
+  file: 'panel.cat.file', sys: 'panel.cat.sys', net: 'panel.cat.net', keychain: 'panel.cat.keychain',
 };
+const catName = (key) => t(CAT_NAMES[key] || key);
 
 function escapeHTML(value = '') {
   return String(value).replace(/[&<>"']/g, (char) => ({
@@ -61,27 +63,36 @@ function formatSize(bytes) {
   return `${(bytes / 1024).toFixed(bytes < 10240 ? 1 : 0)} KB`;
 }
 
+let panelCleanup = null;
+let panelTimer = null;
+let panelObserver = null;
+
+document.addEventListener('idh:langchange', () => {
+  if (document.getElementById('mock-panel')) initMockPanel();
+});
+
 export function initMockPanel() {
+  if (panelCleanup) panelCleanup();
   const host = $('#mock-panel');
   if (!host) return;
 
   host.innerHTML = `
-    <nav class="rc__tabs" role="tablist" aria-label="运行时面板页签"></nav>
+    <nav class="rc__tabs" role="tablist" aria-label="runtime tabs"></nav>
     <div class="rc__toolbar">
       <div class="rc__toolbar-main">
-        <input type="search" class="rc__search" placeholder="搜索本类: 算法/路径/明文/Hex…">
-        <button type="button" class="rc__filter-toggle" aria-expanded="false">筛选<span class="rc__chevron">⌄</span></button>
+        <input type="search" class="rc__search" placeholder="${t('panel.search')}">
+        <button type="button" class="rc__filter-toggle" aria-expanded="false">${t('panel.filter')}<span class="rc__chevron">⌄</span></button>
       </div>
       <div class="rc__adv-filters" hidden>
-        <span class="rc__filter-field"><label>分类</label><select class="rc__cat-sel"><option value="all">全部</option></select></span>
+        <span class="rc__filter-field"><label>${t('panel.cat')}</label><select class="rc__cat-sel"><option value="all">${t('panel.catAll')}</option></select></span>
         <span class="rc__size-filter">
-          <label>输入大小</label>
+          <label>${t('panel.size')}</label>
           <input type="number" class="rc__size-min" min="0" placeholder="0">
           <span class="rc__size-sep">—</span>
-          <input type="number" class="rc__size-max" min="0" placeholder="不限">
+          <input type="number" class="rc__size-max" min="0" placeholder="${t('panel.any')}">
           <span class="rc__size-unit">B</span>
-          <span class="rc__size-hint">不限</span>
-          <button type="button" class="rc__size-reset">清除</button>
+          <span class="rc__size-hint">${t('panel.any')}</span>
+          <button type="button" class="rc__size-reset">${t('panel.clear')}</button>
         </span>
       </div>
     </div>
@@ -138,8 +149,8 @@ export function initMockPanel() {
 
   function updateCategories(tab) {
     const categories = [...new Set(tab.rows.map((row) => row.cat))];
-    categorySelect.innerHTML = '<option value="all">全部</option>' + categories
-      .map((category) => `<option value="${category}">${CAT_NAMES[category] || category}</option>`).join('');
+    categorySelect.innerHTML = '<option value="all">' + t('panel.catAll') + '</option>' + categories
+      .map((category) => `<option value="${category}">${catName(category)}</option>`).join('');
   }
 
   function updateSizeHint() {
@@ -152,19 +163,19 @@ export function initMockPanel() {
     let html = `<div class="rc__detail-head">
       <h2><span class="rc__cat-dot ${row.cat}"></span>#${row.seq} ${escapeHTML(row.algo)}</h2>
       <div class="rc__detail-sub">${escapeHTML(row.op)} · ${escapeHTML(row.time)}</div>
-      <div class="rc__detail-actions"><button type="button" data-copy="all">复制整条</button>${row.input ? '<button type="button" data-copy="input">复制明文</button>' : ''}</div>
+      <div class="rc__detail-actions"><button type="button" data-copy="all">${t('panel.copyAll')}</button>${row.input ? `<button type="button" data-copy="input">${t('panel.copyInput')}</button>` : ''}</div>
     </div>`;
     if (row.key) html += `<div class="rc__io-section rc__io-kv"><div class="rc__io-label rc__io-label--kv">KEY</div><pre class="rc__pre rc__pre--hex">${escapeHTML(row.key)}</pre></div>`;
     if (row.iv) html += `<div class="rc__io-section rc__io-kv"><div class="rc__io-label rc__io-label--kv">IV</div><pre class="rc__pre rc__pre--hex">${escapeHTML(row.iv)}</pre></div>`;
-    html += `<div class="rc__io-section rc__io-in"><div class="rc__io-label rc__io-label--in">输入 / INPUT</div>${ioBody(row.inLen, row.input)}</div>`;
-    html += `<div class="rc__io-section rc__io-out"><div class="rc__io-label rc__io-label--out">输出 / OUTPUT</div>${ioBody(row.outLen, row.output)}</div>`;
-    html += `<details class="rc__callstack"><summary>调用栈 (${row.stack.split('\n').filter(Boolean).length} 帧)</summary><pre class="rc__pre rc__pre--stack">${escapeHTML(row.stack)}</pre></details>`;
+    html += `<div class="rc__io-section rc__io-in"><div class="rc__io-label rc__io-label--in">${t('panel.in')}</div>${ioBody(row.inLen, row.input)}</div>`;
+    html += `<div class="rc__io-section rc__io-out"><div class="rc__io-label rc__io-label--out">${t('panel.out')}</div>${ioBody(row.outLen, row.output)}</div>`;
+    html += `<details class="rc__callstack"><summary>${tpl('panel.stack', { n: row.stack.split('\n').filter(Boolean).length })}</summary><pre class="rc__pre rc__pre--stack">${escapeHTML(row.stack)}</pre></details>`;
     detail.innerHTML = html;
     $$('[data-copy]', detail).forEach((button) => button.addEventListener('click', () => {
       const value = button.dataset.copy === 'input' ? row.input : JSON.stringify(row, null, 2);
       navigator.clipboard?.writeText(value).catch(() => {});
       const label = button.textContent;
-      button.textContent = '已复制';
+      button.textContent = t('panel.copied');
       setTimeout(() => { button.textContent = label; }, 1000);
     }));
   }
@@ -173,8 +184,8 @@ export function initMockPanel() {
     const rows = filteredRows(tab);
     list.innerHTML = '';
     if (!rows.length) {
-      list.innerHTML = '<div class="rc__empty">没有匹配记录</div>';
-      detail.innerHTML = '<div class="rc__detail-empty">调整筛选条件后查看详情</div>';
+      list.innerHTML = `<div class="rc__empty">${t('panel.emptyList')}</div>`;
+      detail.innerHTML = `<div class="rc__detail-empty">${t('panel.emptyDetail')}</div>`;
       return;
     }
     if (!rows.some((row) => row.seq === selectedSeq)) selectedSeq = rows[0].seq;
@@ -183,9 +194,9 @@ export function initMockPanel() {
       button.type = 'button';
       button.className = `rcrow cat-${row.cat}${selectedSeq === row.seq ? ' selected' : ''}`;
       button.innerHTML = `<span class="rcrow__top">
-        <span class="rcrow__seq">#${row.seq}</span><span class="rcrow__pill ${row.cat}">${row.badge}</span>
+        <span class="rcrow__seq">#${row.seq}</span><span class="rcrow__pill ${row.cat}">${escapeHTML(row.badge)}</span>
         <strong>${escapeHTML(row.algo)}</strong><span class="rcrow__op">${escapeHTML(row.op)}</span><time>${escapeHTML(row.time)}</time>
-      </span><span class="rcrow__meta">in:${row.inLen}B · out:${row.outLen}B</span><span class="rcrow__preview">${escapeHTML(row.preview)}</span>`;
+      </span><span class="rcrow__meta">${tpl('panel.meta', { in: row.inLen, out: row.outLen })}</span><span class="rcrow__preview">${escapeHTML(row.preview)}</span>`;
       button.addEventListener('click', () => {
         selectedSeq = row.seq;
         $$('.rcrow', list).forEach((item) => item.classList.remove('selected'));
@@ -200,7 +211,7 @@ export function initMockPanel() {
   function renderFiles() {
     const defaultFile = PANEL_FILES.find((entry) => entry.path === 'Documents/iosdh_test.txt');
     specialPane.innerHTML = `<div class="rc__files-workspace">
-      <aside class="rc__tree-pane"><div class="rc__files-head">沙盒根</div><div class="rc__file-tree"></div></aside>
+      <aside class="rc__tree-pane"><div class="rc__files-head">${t('panel.filesHead')}</div><div class="rc__file-tree"></div></aside>
       <div class="rc__splitter" aria-hidden="true"></div>
       <div class="rc__file-preview"><div class="rc__files-preview-head"><span class="path"></span><span class="meta"></span></div><pre class="rc__files-preview-body"></pre></div>
     </div>`;
@@ -232,9 +243,9 @@ export function initMockPanel() {
 
   function renderSymbols() {
     specialPane.innerHTML = `<div class="rc__symbols-workspace">
-      <aside class="rc__image-pane"><div class="rc__images-head">image 列表 (导入符号均为 fishhook 候选)</div><div class="rc__image-list"></div></aside>
+      <aside class="rc__image-pane"><div class="rc__images-head">${t('panel.symbolsHead')}</div><div class="rc__image-list"></div></aside>
       <div class="rc__splitter" aria-hidden="true"></div>
-      <div class="rc__symbol-detail"><div class="rc__symbol-controls"><input type="search" placeholder="过滤符号 (如 SSL / CC / open)…"><span></span></div><div class="rc__symbol-table"></div></div>
+      <div class="rc__symbol-detail"><div class="rc__symbol-controls"><input type="search" placeholder="${t('panel.symbolsPh')}"><span></span></div><div class="rc__symbol-table"></div></div>
     </div>`;
     const imageList = $('.rc__image-list', specialPane);
     const symbolInput = $('.rc__symbol-controls input', specialPane);
@@ -244,14 +255,14 @@ export function initMockPanel() {
     const renderTable = () => {
       const query = symbolInput.value.trim().toLowerCase();
       const symbols = (PANEL_SYMBOLS[selectedImage.idx] || []).filter((symbol) => symbol.toLowerCase().includes(query));
-      symbolCount.textContent = `${symbols.length} / ${selectedImage.imports} 个`;
-      symbolTable.innerHTML = `<table class="rc__table"><thead><tr><th>#</th><th>导入符号 (均为 fishhook 候选)</th></tr></thead><tbody>${symbols.map((symbol, index) => `<tr><td>${index + 1}</td><td class="symbol">${escapeHTML(symbol)}</td></tr>`).join('')}</tbody></table>`;
+      symbolCount.textContent = tpl('panel.symbolsCount', { n: symbols.length, m: selectedImage.imports });
+      symbolTable.innerHTML = `<table class="rc__table"><thead><tr><th>#</th><th>${t('panel.symbolsTh')}</th></tr></thead><tbody>${symbols.map((symbol, index) => `<tr><td>${index + 1}</td><td class="symbol">${escapeHTML(symbol)}</td></tr>`).join('')}</tbody></table>`;
     };
     PANEL_SYMBOL_IMAGES.forEach((image) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `rc__image-row${image.idx === selectedImage.idx ? ' selected' : ''}`;
-      button.innerHTML = `<span class="top"><strong>${escapeHTML(image.name)}</strong><span>${image.kind}</span></span><small>${image.imports} 个导入符号</small>`;
+      button.innerHTML = `<span class="top"><strong>${escapeHTML(image.name)}</strong><span>${image.kind}</span></span><small>${tpl('panel.symbolsImports', { n: image.imports })}</small>`;
       button.addEventListener('click', () => {
         selectedImage = image;
         $$('.rc__image-row', imageList).forEach((row) => row.classList.remove('selected'));
@@ -267,10 +278,10 @@ export function initMockPanel() {
 
   function renderDump() {
     specialPane.innerHTML = `<div class="rc__dump-pane"><div class="rc__dump-wrap">
-      <h2>应用砸壳 (脱壳 / dump)</h2>
-      <p>当前进程已加载的 App Bundle Mach-O 镜像</p>
-      <table class="rc__table rc__dump-table"><thead><tr><th>镜像</th><th>类型</th><th>大小</th><th>cryptid</th><th>状态</th><th>操作</th></tr></thead>
-      <tbody>${PANEL_DUMP_IMAGES.map((image) => `<tr><td class="symbol">${escapeHTML(image.name)}</td><td>${image.kind}</td><td>${formatSize(image.size)}</td><td>${image.cryptid}</td><td>${image.encrypted ? '已加密' : '未加密'}</td><td><span class="rc__table-action">下载</span></td></tr>`).join('')}</tbody></table>
+      <h2>${t('panel.dumpH2')}</h2>
+      <p>${t('panel.dumpP')}</p>
+      <table class="rc__table rc__dump-table"><thead><tr><th>${t('panel.dumpImage')}</th><th>${t('panel.dumpType')}</th><th>${t('panel.dumpSize')}</th><th>cryptid</th><th>${t('panel.dumpStatus')}</th><th>${t('panel.dumpAction')}</th></tr></thead>
+      <tbody>${PANEL_DUMP_IMAGES.map((image) => `<tr><td class="symbol">${escapeHTML(image.name)}</td><td>${image.kind}</td><td>${formatSize(image.size)}</td><td>${image.cryptid}</td><td>${image.encrypted ? t('panel.dumpEnc') : t('panel.dumpPlain')}</td><td><span class="rc__table-action">${t('panel.dumpDownload')}</span></td></tr>`).join('')}</tbody></table>
     </div></div>`;
   }
 
@@ -307,7 +318,7 @@ export function initMockPanel() {
     button.className = `rc__tab${tab === activeTab ? ' active' : ''}`;
     button.dataset.tab = tab.key;
     button.setAttribute('role', 'tab');
-    button.innerHTML = `${tab.label}${Array.isArray(tab.rows) ? `<span class="rc__tab-n">${revealed.get(tab.key)}</span>` : ''}`;
+    button.innerHTML = `${t('panel.tab.' + tab.key)}${Array.isArray(tab.rows) ? `<span class="rc__tab-n">${revealed.get(tab.key)}</span>` : ''}`;
     button.addEventListener('click', () => switchTab(tab));
     tabsEl.appendChild(button);
     tabButtons.set(tab.key, button);
@@ -369,10 +380,10 @@ export function initMockPanel() {
     const pending = LOG_TABS.flatMap((tab) => tab.rows.slice(0, -1).map((row) => ({ tab, row })))
       .sort((a, b) => a.row.time.localeCompare(b.row.time));
     let index = 0;
-    const timer = window.setInterval(() => {
+    panelTimer = window.setInterval(() => {
       const next = pending[index];
       if (!next) {
-        window.clearInterval(timer);
+        window.clearInterval(panelTimer);
         return;
       }
       revealed.set(next.tab.key, Math.min(next.tab.rows.length, (revealed.get(next.tab.key) || 0) + 1));
@@ -385,11 +396,15 @@ export function initMockPanel() {
   updateCategories(activeTab);
   updateSizeHint();
   renderLogTab(activeTab);
-  const observer = new IntersectionObserver((entries) => {
+  panelObserver = new IntersectionObserver((entries) => {
     if (entries.some((entry) => entry.isIntersecting)) {
       startCaptureAnimation();
-      observer.disconnect();
+      panelObserver.disconnect();
     }
   }, { threshold: 0.25 });
-  observer.observe(host);
+  panelObserver.observe(host);
+  panelCleanup = () => {
+    if (panelTimer) { window.clearInterval(panelTimer); panelTimer = null; }
+    if (panelObserver) { panelObserver.disconnect(); panelObserver = null; }
+  };
 }
