@@ -1,6 +1,6 @@
 import './style.css';
 import { $, el, renderChrome } from './layout.js';
-import { t, initI18n } from './i18n.js';
+import { t, getLang, initI18n } from './i18n.js';
 import { NEWS_ARTICLES } from './news-data.js';
 import { renderMarkdown } from './markdown.js';
 
@@ -8,12 +8,18 @@ function escapeHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+const pick = (a) => {
+  const d = getLang() === 'en' && a.en ? a.en : a;
+  return { title: d.title, summary: d.summary, content: d.content };
+};
+
 /* ---------------- article list ---------------- */
 function renderList() {
   const root = $('#news-root');
   root.className = 'articles';
   root.innerHTML = '';
   NEWS_ARTICLES.forEach((a, i) => {
+    const d = pick(a);
     const card = el('a', 'article-card' + (i === 0 ? ' article-card--latest' : ''));
     card.href = `#/${a.slug}`;
     card.innerHTML = `
@@ -22,12 +28,9 @@ function renderList() {
         ${i === 0 ? `<span class="article-card__tag">${t('news.latest')}</span>` : ''}
       </div>
       <div class="article-card__body">
-        <h2>${escapeHtml(a.title)}</h2>
-        <p>${escapeHtml(a.summary)}</p>
-        <div class="article-card__meta">
-          ${a.tags.map((tag) => `<code>${escapeHtml(tag)}</code>`).join('')}
-          <span class="article-card__more">${t('news.readmore')}</span>
-        </div>
+        <h2>${escapeHtml(d.title)}</h2>
+        <p>${escapeHtml(d.summary)}</p>
+        <span class="article-card__more" aria-hidden="true">→</span>
       </div>`;
     root.appendChild(card);
   });
@@ -38,18 +41,17 @@ function renderArticle(slug) {
   const a = NEWS_ARTICLES.find((x) => x.slug === slug);
   const root = $('#news-root');
   if (!a) { renderList(); return; }
+  const d = pick(a);
   root.className = 'article';
   root.innerHTML = `
     <a class="article__back" href="#/">${t('news.back')}</a>
     <header class="article__head">
       <div class="article-card__rail">
         <time datetime="${a.date}">${a.date}</time>
-        <span class="article-card__tag">${t('news.article')}</span>
       </div>
-      <h1>${escapeHtml(a.title)}</h1>
-      <div class="article-card__meta">${a.tags.map((tag) => `<code>${escapeHtml(tag)}</code>`).join('')}</div>
+      <h1>${escapeHtml(d.title)}</h1>
     </header>
-    <div class="article__body">${renderMarkdown(a.content)}</div>`;
+    <div class="article__body">${renderMarkdown(d.content)}</div>`;
   root.querySelector('.article__back').addEventListener('click', (e) => {
     e.preventDefault();
     location.hash = '#/';

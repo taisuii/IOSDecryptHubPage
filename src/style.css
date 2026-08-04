@@ -473,18 +473,16 @@ code, pre { font-family: var(--mono); }
 
 /* News articles */
 .articles { max-width: 860px; display: flex; flex-direction: column; }
-.article-card { position: relative; display: block; padding: 26px 26px 22px 26px; margin-bottom: 16px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: var(--radius); transition: border-color .2s; }
+.article-card { position: relative; display: block; padding: 24px 26px 22px; margin-bottom: 14px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: var(--radius); transition: border-color .2s; }
 .article-card:hover { border-left-color: var(--blue); }
-.article-card--latest { border-left-color: var(--blue); background: linear-gradient(180deg, #101a2b, var(--surface)); }
+.article-card--latest { border-left-color: var(--blue); }
 .article-card__rail { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .article-card__rail time { color: var(--ink-3); font: 11px/1 var(--mono); }
 .article-card__tag { padding: 3px 8px; color: #050506; background: var(--blue); border-radius: 3px; font: 600 9px/1 var(--mono); }
 .article-card__body h2 { margin: 0 0 8px; font-size: 20px; font-weight: 620; line-height: 1.4; }
-.article-card__body p { margin: 0 0 14px; color: var(--ink-3); font-size: 14px; line-height: 1.8; }
-.article-card__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.article-card__meta code { padding: 2px 8px; color: var(--cyan); background: #10252b; border-radius: 3px; font: 600 10px/1.4 var(--mono); }
-.article-card__more { margin-left: auto; color: var(--blue); font: 600 11px/1.4 var(--mono); white-space: nowrap; }
-.article-card--latest .article-card__more { color: var(--ink); }
+.article-card__body p { margin: 0; color: var(--ink-3); font-size: 14px; line-height: 1.8; }
+.article-card__more { position: absolute; right: 22px; bottom: 20px; color: var(--ink-3); font-size: 18px; line-height: 1; transition: color .15s, transform .15s; }
+.article-card:hover .article-card__more { color: var(--blue); transform: translateX(3px); }
 
 /* Article detail */
 .article { max-width: 860px; }
