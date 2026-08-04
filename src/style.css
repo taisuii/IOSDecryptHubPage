@@ -429,7 +429,7 @@ code, pre { font-family: var(--mono); }
 .start__code .c { color: var(--ink-3); }
 .start__code .s { color: var(--blue); }
 .start__copy { position: absolute; top: 8px; right: 9px; min-height: 28px; padding: 0 9px; color: var(--blue); background: #0a0c10; border: 1px solid var(--line); border-radius: 4px; font: 10px/1 var(--mono); }
-.note { margin-top: 20px; padding: 14px 16px; color: var(--ink-3); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); font-size: 12px; }
+.note { margin-top: 20px; color: var(--ink-3); font-size: 12px; }
 .foot { padding: 56px 0 24px; background: #030304; border-top: 1px solid var(--line); }
 .foot__grid { padding-bottom: 30px; display: flex; justify-content: space-between; gap: 30px; border-bottom: 1px solid var(--line-soft); }
 .foot__brand p { max-width: 440px; margin: 9px 0 0; color: var(--ink-3); font-size: 13px; }
