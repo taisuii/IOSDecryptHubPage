@@ -1,6 +1,5 @@
 {
   "minVersion": "0.1",
-  "headerImage": "https://ios.decrypthub.com/depictions/com.iosdecrypthub/header.png",
   "class": "DepictionTabView",
   "tabs": [
     {
@@ -9,7 +8,7 @@
       "views": [
         {
           "class": "DepictionMarkdownView",
-          "markdown": "## IOSDecryptHub\n\niOS 运行时安全分析工具。以 dylib 注入目标 App 进程，实时捕获加解密、文件、网络、Keychain、动态加载等行为。\n\n### 功能\n\n- 🔐 加解密 Hook（CommonCrypto / OpenSSL EVP）\n- 📁 文件 I/O 监控\n- 🌐 网络请求捕获\n- 🔑 Keychain 访问追踪\n- 📦 动态库加载监控\n- 🖥️ 内嵌 Web 面板（端口 8088）\n- 🤖 MCP 服务（AI Agent 远程分析）\n\n### 依赖\n\n- ElleKit（dylib 加载器）\n- PreferenceLoader（设置面板）\n\n### 使用\n\n安装后在 **设置 → IOSDecryptHub** 中选择要注入的 App，重启目标 App 即可生效。"
+          "markdown": "## IOSDecryptHub\n\n[ios.decrypthub.com](https://ios.decrypthub.com)\n\n安装后在 **设置 → IOSDecryptHub** 中选择要注入的 App。"
         },
         {
           "class": "DepictionSeparatorView"
@@ -17,7 +16,7 @@
         {
           "class": "DepictionTableTextView",
           "title": "版本",
-          "text": "1.23.8"
+          "text": "1.24.1"
         },
         {
           "class": "DepictionTableTextView",
@@ -28,21 +27,6 @@
           "class": "DepictionTableTextView",
           "title": "最低系统",
           "text": "iOS 14.0"
-        },
-        {
-          "class": "DepictionTableTextView",
-          "title": "作者",
-          "text": "IOSDecryptHub"
-        }
-      ]
-    },
-    {
-      "class": "DepictionStackView",
-      "tabname": "更新日志",
-      "views": [
-        {
-          "class": "DepictionMarkdownView",
-          "markdown": "## 1.23.8\n\n- 大型 App 的 xref 支持 48MB 分页扫描和覆盖诊断\n- 新增完整 dyld 镜像地图与 Objective-C 方法实体查询\n- IMP / 符号解析增加 PAC 归一化和真实镜像归属\n- 保持 rootless / roothide 双架构与现有 MCP 接口兼容"
         }
       ]
     }

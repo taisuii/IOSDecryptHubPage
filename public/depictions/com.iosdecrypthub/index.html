@@ -9,46 +9,26 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); padding: 16px; line-height: 1.6; }
 h1 { font-size: 22px; margin-bottom: 4px; }
-h2 { font-size: 16px; margin: 16px 0 8px; color: var(--accent); }
 .subtitle { color: var(--dim); font-size: 13px; margin-bottom: 16px; }
 .card { background: var(--surface); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-ul { padding-left: 20px; font-size: 14px; }
-li { margin-bottom: 4px; }
+a.site { display: block; color: var(--accent); font-size: 15px; font-weight: 600; text-decoration: none; }
+a.site:hover { text-decoration: underline; }
 .meta { display: grid; grid-template-columns: 80px 1fr; gap: 6px 12px; font-size: 13px; }
 .meta dt { color: var(--dim); }
-.badge { display: inline-block; background: var(--accent); color: #000; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
 </style>
 </head>
 <body>
-<h1>IOSDecryptHub <span class="badge">rootless / roothide</span></h1>
-<p class="subtitle">iOS 运行时安全分析工具 · v1.23.8</p>
+<h1>IOSDecryptHub</h1>
+<p class="subtitle">v1.24.1</p>
 
 <div class="card">
-<h2>功能</h2>
-<ul>
-<li>🔐 加解密 Hook（CommonCrypto / OpenSSL EVP）</li>
-<li>📁 文件 I/O 监控</li>
-<li>🌐 网络请求捕获</li>
-<li>🔑 Keychain 访问追踪</li>
-<li>📦 动态库加载监控</li>
-<li>🖥️ 内嵌 Web 面板（端口 8088）</li>
-<li>🤖 MCP 服务（AI Agent 远程分析）</li>
-</ul>
+<a class="site" href="https://ios.decrypthub.com">ios.decrypthub.com →</a>
 </div>
 
 <div class="card">
-<h2>使用</h2>
-<p style="font-size:14px">安装后在 <strong>设置 → IOSDecryptHub</strong> 中选择要注入的 App，重启目标 App 即可生效。Web 面板自动监听 <code>0.0.0.0:8088</code>。</p>
-</div>
-
-<div class="card">
-<h2>信息</h2>
 <dl class="meta">
-<dt>版本</dt><dd>1.23.8</dd>
 <dt>架构</dt><dd>arm64 / arm64e (rootless / roothide)</dd>
 <dt>最低系统</dt><dd>iOS 14.0</dd>
-<dt>依赖</dt><dd>ElleKit, PreferenceLoader</dd>
-<dt>作者</dt><dd>IOSDecryptHub</dd>
 </dl>
 </div>
 </body>
