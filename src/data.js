@@ -14,7 +14,7 @@ export const DYLIB_DOWNLOAD = {
   filename: 'decrypt_helper-1.24.3.dylib',
   url: '/dylibs/decrypt_helper-1.24.3.dylib',
   size: '2.2 MB',
-  sha256: '010efd7d8440df45256db3533f545729625ddde5113de1fd1abe79370b47e5a8',
+  sha256: '9f723c502c4330e0d787b3f093b88991db8b4b79e78d2230b6fd9a5f3fdb0732',
 };
 
 export const CAPABILITIES = [
