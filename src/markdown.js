@@ -68,6 +68,24 @@ export function renderMarkdown(md) {
       continue;
     }
 
+    if (/^\|.*\|$/.test(t) && i + 1 < lines.length && /^\|[\s\-:|]+\|$/.test(lines[i + 1].trim())) {
+      const rows = [];
+      while (i < lines.length && /^\|.*\|$/.test(lines[i].trim())) {
+        const cells = lines[i].trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+        rows.push(cells);
+        i++;
+      }
+      if (rows.length >= 2) {
+        const head = rows[0];
+        const body = rows.slice(2);
+        out.push(
+          `<table><thead><tr>${head.map((c) => `<th>${inline(c)}</th>`).join('')}</tr></thead>` +
+          `<tbody>${body.map((row) => `<tr>${row.map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`
+        );
+      }
+      continue;
+    }
+
     if (t.startsWith('>')) {
       out.push(`<blockquote>${inline(t.slice(1).trim())}</blockquote>`);
       i++;

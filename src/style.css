@@ -615,3 +615,10 @@ code, pre { font-family: var(--mono); }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* Article tables */
+.article__body table { width: 100%; margin: 18px 0 22px; border-collapse: collapse; font-size: 13px; }
+.article__body th, .article__body td { padding: 8px 12px; border: 1px solid var(--line); text-align: left; }
+.article__body th { color: var(--ink); background: var(--surface-2); font-weight: 600; }
+.article__body td { color: var(--ink-2); }
+.article__body td code, .article__body th code { font-size: 12px; }
